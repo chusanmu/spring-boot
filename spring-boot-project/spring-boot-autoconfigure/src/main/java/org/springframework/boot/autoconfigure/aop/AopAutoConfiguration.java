@@ -57,6 +57,9 @@ public class AopAutoConfiguration {
 
 		}
 
+		/**
+		 * spring boot 默认使用cglib的代理方式
+		 */
 		@Configuration(proxyBeanMethods = false)
 		@EnableAspectJAutoProxy(proxyTargetClass = true)
 		@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "true",
@@ -76,6 +79,7 @@ public class AopAutoConfiguration {
 		ClassProxyingConfiguration(BeanFactory beanFactory) {
 			if (beanFactory instanceof BeanDefinitionRegistry) {
 				BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+				// TODO: 注册自动代理创建器，和配置使用cglib代理
 				AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}

@@ -62,6 +62,7 @@ public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {
 		if (this.beanFactory instanceof ListableBeanFactory && getClass() == TypeExcludeFilter.class) {
+			// TODO: 委托给容器中所有的 TypeExcludeFilter 类去匹配，它自己并不做任何事情
 			for (TypeExcludeFilter delegate : getDelegates()) {
 				if (delegate.match(metadataReader, metadataReaderFactory)) {
 					return true;
@@ -71,6 +72,10 @@ public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 		return false;
 	}
 
+	/**
+	 * TODO: 把容器中所有的 TypeExcludeFilter 拿到
+	 * @return
+	 */
 	private Collection<TypeExcludeFilter> getDelegates() {
 		Collection<TypeExcludeFilter> delegates = this.delegates;
 		if (delegates == null) {

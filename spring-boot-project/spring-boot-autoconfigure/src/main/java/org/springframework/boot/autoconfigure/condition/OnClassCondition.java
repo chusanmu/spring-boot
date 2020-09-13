@@ -88,34 +88,48 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// TODO: 获取当前的classLoader, 然后构建一个空的ConditionMessage
 		ClassLoader classLoader = context.getClassLoader();
 		ConditionMessage matchMessage = ConditionMessage.empty();
+		// TODO: 这里拿到的是className集合
 		List<String> onClasses = getCandidates(metadata, ConditionalOnClass.class);
 		if (onClasses != null) {
+			// TODO: 这里去判断下，当前classpath下是否没有，把没有的收集过来
 			List<String> missing = filter(onClasses, ClassNameFilter.MISSING, classLoader);
 			if (!missing.isEmpty()) {
+				// TODO: 这里就开始构造日志信息了，不匹配，直接返回
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)
 						.didNotFind("required class", "required classes").items(Style.QUOTE, missing));
 			}
+			// TODO: 这里去构建存在class的情况
 			matchMessage = matchMessage.andCondition(ConditionalOnClass.class)
 					.found("required class", "required classes")
+					// TODO: filter变成了ClassNameFilter.PRESENT
 					.items(Style.QUOTE, filter(onClasses, ClassNameFilter.PRESENT, classLoader));
 		}
+		// TODO: 尝试拿到 ConditionalOnMissingClass 这个注解
 		List<String> onMissingClasses = getCandidates(metadata, ConditionalOnMissingClass.class);
+		// TODO: 如果 存在
 		if (onMissingClasses != null) {
+			// TODO: 去加载下，看看有没有
 			List<String> present = filter(onMissingClasses, ClassNameFilter.PRESENT, classLoader);
+			// TODO: 加载到了
 			if (!present.isEmpty()) {
+				// TODO: 到这里其实就是不匹配，然后直接返回就ok了
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnMissingClass.class)
 						.found("unwanted class", "unwanted classes").items(Style.QUOTE, present));
 			}
+			// TODO: 更换filter继续尝试过滤
 			matchMessage = matchMessage.andCondition(ConditionalOnMissingClass.class)
 					.didNotFind("unwanted class", "unwanted classes")
 					.items(Style.QUOTE, filter(onMissingClasses, ClassNameFilter.MISSING, classLoader));
 		}
+		// TODO: 最后走到这里，就是匹配，则构建匹配消息
 		return ConditionOutcome.match(matchMessage);
 	}
 
 	private List<String> getCandidates(AnnotatedTypeMetadata metadata, Class<?> annotationType) {
+		// TODO: 拿到当前注解的所有的属性及值
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(annotationType.getName(), true);
 		if (attributes == null) {
 			return null;

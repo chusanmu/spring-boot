@@ -37,6 +37,7 @@ class ConditionEvaluationReportAutoConfigurationImportListener
 	@Override
 	public void onAutoConfigurationImportEvent(AutoConfigurationImportEvent event) {
 		if (this.beanFactory != null) {
+			// TODO: 其实这里 就是操作 记录缓存
 			ConditionEvaluationReport report = ConditionEvaluationReport.get(this.beanFactory);
 			report.recordEvaluationCandidates(event.getCandidateConfigurations());
 			report.recordExclusions(event.getExclusions());

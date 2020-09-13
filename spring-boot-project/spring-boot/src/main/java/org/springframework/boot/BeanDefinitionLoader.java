@@ -46,6 +46,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 用于加载beanDefinition, 里面维护了 BeanDefinitionReader, ClassPathBeanDefinitionScanner,还有ResourceLoader
  * Loads bean definitions from underlying sources, including XML and JavaConfig. Acts as a
  * simple facade over {@link AnnotatedBeanDefinitionReader},
  * {@link XmlBeanDefinitionReader} and {@link ClassPathBeanDefinitionScanner}. See
@@ -59,12 +60,19 @@ class BeanDefinitionLoader {
 
 	private final Object[] sources;
 
+
+	/**
+	 * TODO: 用于 读取 beanDefinition
+	 */
 	private final AnnotatedBeanDefinitionReader annotatedReader;
 
 	private final XmlBeanDefinitionReader xmlReader;
 
 	private BeanDefinitionReader groovyReader;
 
+	/**
+	 * TODO: 用于扫描beanDefinition
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 	private ResourceLoader resourceLoader;
@@ -84,6 +92,7 @@ class BeanDefinitionLoader {
 		if (isGroovyPresent()) {
 			this.groovyReader = new GroovyBeanDefinitionReader(registry);
 		}
+		// TODO: 用来扫描beanDefinition
 		this.scanner = new ClassPathBeanDefinitionScanner(registry);
 		this.scanner.addExcludeFilter(new ClassExcludeFilter(sources));
 	}
@@ -124,12 +133,18 @@ class BeanDefinitionLoader {
 	 */
 	int load() {
 		int count = 0;
+		// TODO: 遍历sources,然后调load方法
 		for (Object source : this.sources) {
 			count += load(source);
 		}
 		return count;
 	}
 
+	/**
+	 * TODO: 根据source类型，调用不同的load方法
+	 * @param source
+	 * @return
+	 */
 	private int load(Object source) {
 		Assert.notNull(source, "Source must not be null");
 		if (source instanceof Class<?>) {
@@ -153,6 +168,7 @@ class BeanDefinitionLoader {
 			GroovyBeanDefinitionSource loader = BeanUtils.instantiateClass(source, GroovyBeanDefinitionSource.class);
 			load(loader);
 		}
+		// TODO: 判断source是否合法，如果合法进行注册，不能是匿名内部类
 		if (isEligible(source)) {
 			this.annotatedReader.register(source);
 			return 1;
@@ -293,6 +309,7 @@ class BeanDefinitionLoader {
 	}
 
 	/**
+	 * TODO: 扫描的时候排除掉主类，就是你传进去的启动类
 	 * Simple {@link TypeFilter} used to ensure that specified {@link Class} sources are
 	 * not accidentally re-added during scanning.
 	 */

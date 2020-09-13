@@ -397,10 +397,14 @@ public final class ConditionMessage {
 	}
 
 	/**
+	 * 渲染样式
 	 * Render styles.
 	 */
 	public enum Style {
 
+		/**
+		 * 这个就是正常输出
+		 */
 		NORMAL {
 			@Override
 			protected Object applyToItem(Object item) {
@@ -413,6 +417,9 @@ public final class ConditionMessage {
 			}
 		},
 
+		/**
+		 * 这个就是通过字符串的方式去渲染
+		 */
 		QUOTE {
 			@Override
 			protected String applyToItem(Object item) {

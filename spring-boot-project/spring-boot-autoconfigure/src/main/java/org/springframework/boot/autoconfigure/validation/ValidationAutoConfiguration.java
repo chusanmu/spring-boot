@@ -58,6 +58,13 @@ public class ValidationAutoConfiguration {
 		return factoryBean;
 	}
 
+
+	/**
+	 * TODO: 这个后置处理处理方法里单个参数校验的注解 JSR和hibernate validator的校验只能对Object的属性，也就是bean进行校验，不能对单个的参数进行校验
+	 * @param environment
+	 * @param validator
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public static MethodValidationPostProcessor methodValidationPostProcessor(Environment environment,

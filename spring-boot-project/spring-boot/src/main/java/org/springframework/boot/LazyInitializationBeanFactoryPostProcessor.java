@@ -43,11 +43,15 @@ public final class LazyInitializationBeanFactoryPostProcessor implements BeanFac
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// Take care not to force the eager init of factory beans when getting filters
+		// TODO: 先从容器中获取所有的LazyInitializationExcludeFilter
 		Collection<LazyInitializationExcludeFilter> filters = beanFactory
 				.getBeansOfType(LazyInitializationExcludeFilter.class, false, false).values();
+		// TODO: 把所有的beanName拿到
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+			// TODO: 把beanDefinition拿到
 			if (beanDefinition instanceof AbstractBeanDefinition) {
+				// TODO: 去做处理
 				postProcess(beanFactory, filters, beanName, (AbstractBeanDefinition) beanDefinition);
 			}
 		}
@@ -56,12 +60,15 @@ public final class LazyInitializationBeanFactoryPostProcessor implements BeanFac
 	private void postProcess(ConfigurableListableBeanFactory beanFactory,
 			Collection<LazyInitializationExcludeFilter> filters, String beanName,
 			AbstractBeanDefinition beanDefinition) {
+		// TODO: 拿到它的lazyInit属性
 		Boolean lazyInit = beanDefinition.getLazyInit();
 		if (lazyInit != null) {
 			return;
 		}
 		Class<?> beanType = getBeanType(beanFactory, beanName);
+		// TODO: 看看当前的bean是否需要排除
 		if (!isExcluded(filters, beanName, beanDefinition, beanType)) {
+			// TODO: 设置成懒加载
 			beanDefinition.setLazyInit(true);
 		}
 	}
@@ -77,8 +84,11 @@ public final class LazyInitializationBeanFactoryPostProcessor implements BeanFac
 
 	private boolean isExcluded(Collection<LazyInitializationExcludeFilter> filters, String beanName,
 			AbstractBeanDefinition beanDefinition, Class<?> beanType) {
+		// TODO: beanType不等于空，表示容器中存在， 这时候才进来判断
 		if (beanType != null) {
+			// TODO: 执行所有filter的isExcluded方法
 			for (LazyInitializationExcludeFilter filter : filters) {
+				// TODO: 如果排除就返回true
 				if (filter.isExcluded(beanName, beanDefinition, beanType)) {
 					return true;
 				}

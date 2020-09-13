@@ -57,8 +57,13 @@ public final class SpringBootVersion {
 		return determineSpringBootVersion();
 	}
 
+	/**
+	 * TODO: 判断当前spring boot版本号
+	 * @return
+	 */
 	private static String determineSpringBootVersion() {
 		String implementationVersion = SpringBootVersion.class.getPackage().getImplementationVersion();
+		// TODO: 通过package信息 拿版本号
 		if (implementationVersion != null) {
 			return implementationVersion;
 		}

@@ -32,6 +32,7 @@ import org.springframework.core.env.Environment;
 public interface Banner {
 
 	/**
+	 * TODO: 打印banner
 	 * Print the banner to the specified print stream.
 	 * @param environment the spring environment
 	 * @param sourceClass the source class for the application
@@ -40,6 +41,7 @@ public interface Banner {
 	void printBanner(Environment environment, Class<?> sourceClass, PrintStream out);
 
 	/**
+	 * TODO: banner的模式，可以选择关闭，或者控制台打印，或者打到日志中
 	 * An enumeration of possible values for configuring the Banner.
 	 */
 	enum Mode {

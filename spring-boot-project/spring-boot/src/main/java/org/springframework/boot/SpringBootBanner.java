@@ -30,6 +30,9 @@ import org.springframework.core.env.Environment;
  */
 class SpringBootBanner implements Banner {
 
+	/**
+	 * spring boot banner
+	 */
 	private static final String[] BANNER = { "", "  .   ____          _            __ _ _",
 			" /\\\\ / ___'_ __ _ _(_)_ __  __ _ \\ \\ \\ \\", "( ( )\\___ | '_ | '_| | '_ \\/ _` | \\ \\ \\ \\",
 			" \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )", "  '  |____| .__|_| |_|_| |_\\__, | / / / /",
@@ -39,11 +42,18 @@ class SpringBootBanner implements Banner {
 
 	private static final int STRAP_LINE_SIZE = 42;
 
+	/**
+	 * 打印banner
+	 * @param environment the spring environment
+	 * @param sourceClass the source class for the application
+	 * @param printStream
+	 */
 	@Override
 	public void printBanner(Environment environment, Class<?> sourceClass, PrintStream printStream) {
 		for (String line : BANNER) {
 			printStream.println(line);
 		}
+		// TODO: 获取当前版本号
 		String version = SpringBootVersion.getVersion();
 		version = (version != null) ? " (v" + version + ")" : "";
 		StringBuilder padding = new StringBuilder();

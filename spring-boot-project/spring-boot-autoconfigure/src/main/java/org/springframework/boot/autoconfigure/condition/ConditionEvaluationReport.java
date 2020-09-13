@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * TODO: 该类起到了一个缓存的作用
  * Records condition evaluation details for reporting and logging.
  *
  * @author Greg Turnquist
@@ -59,6 +60,9 @@ public final class ConditionEvaluationReport {
 
 	private ConditionEvaluationReport parent;
 
+	/**
+	 * TODO: 用来记录排除的 自动装配的 configuration
+	 */
 	private final List<String> exclusions = new ArrayList<>();
 
 	private final Set<String> unconditionalClasses = new HashSet<>();
@@ -77,13 +81,17 @@ public final class ConditionEvaluationReport {
 	 * @param outcome the condition outcome
 	 */
 	public void recordConditionEvaluation(String source, Condition condition, ConditionOutcome outcome) {
+		// TODO: 三个入参，均不能 为空
 		Assert.notNull(source, "Source must not be null");
 		Assert.notNull(condition, "Condition must not be null");
 		Assert.notNull(outcome, "Outcome must not be null");
 		this.unconditionalClasses.remove(source);
+		// TODO: 如果 outcomes 不存在这个source
 		if (!this.outcomes.containsKey(source)) {
+			// TODO: 则创建一个放进去
 			this.outcomes.put(source, new ConditionAndOutcomes());
 		}
+		// TODO: 加到outcomes中，ConditionAndOutcomes封装了condition和outcome
 		this.outcomes.get(source).add(condition, outcome);
 		this.addedAncestorOutcomes = false;
 	}
@@ -174,6 +182,7 @@ public final class ConditionEvaluationReport {
 	}
 
 	/**
+	 * TODO: 把当前ConditionEvaluationReport 如果没有 放进容器里面去，或者从容器里面拿出来
 	 * Obtain a {@link ConditionEvaluationReport} for the specified bean factory.
 	 * @param beanFactory the bean factory
 	 * @return an existing or new {@link ConditionEvaluationReport}
@@ -194,6 +203,7 @@ public final class ConditionEvaluationReport {
 	}
 
 	private static void locateParent(BeanFactory beanFactory, ConditionEvaluationReport report) {
+		// TODO: 如果父容器里面包含这个bean，则设置report.parent指向其父容器中的那个bean
 		if (beanFactory != null && report.parent == null && beanFactory.containsBean(BEAN_NAME)) {
 			report.parent = beanFactory.getBean(BEAN_NAME, ConditionEvaluationReport.class);
 		}

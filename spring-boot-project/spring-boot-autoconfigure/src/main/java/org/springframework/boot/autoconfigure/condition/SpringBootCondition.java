@@ -42,11 +42,16 @@ public abstract class SpringBootCondition implements Condition {
 
 	@Override
 	public final boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// TODO: 拿到当前的类名，或者方法名
 		String classOrMethodName = getClassOrMethodName(metadata);
 		try {
+			// TODO: 获取condition匹配结果，这个方法，留给了子类去实现
 			ConditionOutcome outcome = getMatchOutcome(context, metadata);
+			// TODO: 去打印日志
 			logOutcome(classOrMethodName, outcome);
+			// TODO: 记录结果，相当于缓存起来
 			recordEvaluation(context, classOrMethodName, outcome);
+			// TODO: 把是否匹配返回回去
 			return outcome.isMatch();
 		}
 		catch (NoClassDefFoundError ex) {
@@ -61,6 +66,12 @@ public abstract class SpringBootCondition implements Condition {
 		}
 	}
 
+	/**
+	 * TODO: 如果是AnnotationMetadata,直接把类名返回，否则 如果是 methodMetadata，则直接把类名和方法名拼接 中间以点分隔
+	 *
+	 * @param metadata
+	 * @return
+	 */
 	private String getName(AnnotatedTypeMetadata metadata) {
 		if (metadata instanceof AnnotationMetadata) {
 			return ((AnnotationMetadata) metadata).getClassName();
@@ -83,6 +94,7 @@ public abstract class SpringBootCondition implements Condition {
 
 	protected final void logOutcome(String classOrMethodName, ConditionOutcome outcome) {
 		if (this.logger.isTraceEnabled()) {
+			// TODO: 这里其实就是打印日志
 			this.logger.trace(getLogMessage(classOrMethodName, outcome));
 		}
 	}

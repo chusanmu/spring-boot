@@ -68,6 +68,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 			}
 		}
 		finally {
+			// TODO: 清空异常信息
 			this.loggedExceptions.clear();
 			if (this.exitCode != 0) {
 				System.exit(this.exitCode);

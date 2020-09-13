@@ -353,6 +353,10 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * TODO: 注册了一个RequestContextFilter过滤器
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean({ RequestContextListener.class, RequestContextFilter.class })
 		@ConditionalOnMissingFilterBean(RequestContextFilter.class)

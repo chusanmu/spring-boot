@@ -30,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 用来去打印banner的类
  * Class used by {@link SpringApplication} to print the application banner.
  *
  * @author Phillip Webb
@@ -44,6 +45,9 @@ class SpringApplicationBannerPrinter {
 
 	static final String[] IMAGE_EXTENSION = { "gif", "jpg", "png" };
 
+	/**
+	 * TODO: 默认的banner, 就是打印spring boot
+	 */
 	private static final Banner DEFAULT_BANNER = new SpringBootBanner();
 
 	private final ResourceLoader resourceLoader;
@@ -67,27 +71,41 @@ class SpringApplicationBannerPrinter {
 	}
 
 	Banner print(Environment environment, Class<?> sourceClass, PrintStream out) {
+		// TODO: 获取banner
 		Banner banner = getBanner(environment);
+		// TODO: 打印，如果同时存在文本和图片，就都打印
 		banner.printBanner(environment, sourceClass, out);
 		return new PrintedBanner(banner, sourceClass);
 	}
 
+	/**
+	 * TODO: 从当前环境中获取banner
+	 * @param environment
+	 * @return
+	 */
 	private Banner getBanner(Environment environment) {
 		Banners banners = new Banners();
+		// TODO: 获取imageBanner
 		banners.addIfNotNull(getImageBanner(environment));
+		// TODO: 获取一个文本banner
 		banners.addIfNotNull(getTextBanner(environment));
+		// TODO: 如果banners不为空，返回回去
 		if (banners.hasAtLeastOneBanner()) {
 			return banners;
 		}
+		// TODO: 如果fallbackBanner不为空，则使用它
 		if (this.fallbackBanner != null) {
 			return this.fallbackBanner;
 		}
+		// TODO: 否则使用默认的banner
 		return DEFAULT_BANNER;
 	}
 
 	private Banner getTextBanner(Environment environment) {
+		// TODO: 去指定位置上加载banner路径
 		String location = environment.getProperty(BANNER_LOCATION_PROPERTY, DEFAULT_BANNER_LOCATION);
 		Resource resource = this.resourceLoader.getResource(location);
+		// TODO: 如果存在返回一个ResourceBanner
 		if (resource.exists()) {
 			return new ResourceBanner(resource);
 		}
@@ -95,14 +113,20 @@ class SpringApplicationBannerPrinter {
 	}
 
 	private Banner getImageBanner(Environment environment) {
+		// TODO: 获取图片位置
 		String location = environment.getProperty(BANNER_IMAGE_LOCATION_PROPERTY);
+		// TODO: 如果存在
 		if (StringUtils.hasLength(location)) {
+			// TODO: 使用resourceLoader去加载Resource
 			Resource resource = this.resourceLoader.getResource(location);
+			// TODO: 如果存在返回一个ImageBanner
 			return resource.exists() ? new ImageBanner(resource) : null;
 		}
+		// TODO: 如果获取到的路径为"", 那就遍历下扩展名，看看当前类路径下有没有banner
 		for (String ext : IMAGE_EXTENSION) {
 			Resource resource = this.resourceLoader.getResource("banner." + ext);
 			if (resource.exists()) {
+				// TODO: 如果存在，返回一个ImageBanner
 				return new ImageBanner(resource);
 			}
 		}
@@ -136,6 +160,7 @@ class SpringApplicationBannerPrinter {
 
 		@Override
 		public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
+			// TODO: 还能打印多个banner
 			for (Banner banner : this.banners) {
 				banner.printBanner(environment, sourceClass, out);
 			}

@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 我们容器有错误抛出的时候，最后一般都会打印这个信息
  * {@link FailureAnalysisReporter} that logs the failure analysis.
  *
  * @author Andy Wilkinson

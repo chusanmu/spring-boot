@@ -44,6 +44,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * TODO: 和rabbit mq 相关的自动配置
  * {@link EnableAutoConfiguration Auto-configuration} for {@link RabbitTemplate}.
  * <p>
  * This configuration class is active only when the RabbitMQ and Spring AMQP client
@@ -93,6 +94,13 @@ public class RabbitAutoConfiguration {
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	protected static class RabbitConnectionFactoryCreator {
 
+		/**
+		 * TODO: 配置rabbit mq 连接工厂
+		 * @param properties
+		 * @param connectionNameStrategy
+		 * @return
+		 * @throws Exception
+		 */
 		@Bean
 		public CachingConnectionFactory rabbitConnectionFactory(RabbitProperties properties,
 				ObjectProvider<ConnectionNameStrategy> connectionNameStrategy) throws Exception {
@@ -164,6 +172,12 @@ public class RabbitAutoConfiguration {
 			return configurer;
 		}
 
+		/**
+		 * TODO: 配置了RabbitTemplate, 最常用的template
+		 * @param configurer
+		 * @param connectionFactory
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnSingleCandidate(ConnectionFactory.class)
 		@ConditionalOnMissingBean(RabbitOperations.class)

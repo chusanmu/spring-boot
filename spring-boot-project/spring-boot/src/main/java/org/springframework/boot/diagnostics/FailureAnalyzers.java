@@ -36,6 +36,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * TODO: SpringBootExceptionReporter 的唯一实现
  * Utility to trigger {@link FailureAnalyzer} and {@link FailureAnalysisReporter}
  * instances loaded from {@code spring.factories}.
  * <p>
@@ -56,6 +57,10 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 
 	private final List<FailureAnalyzer> analyzers;
 
+	/**
+	 * TODO: 在进行加载的时候，会进行传参，把applicationContext传进来。利用反射的方式传进来
+	 * @param context
+	 */
 	FailureAnalyzers(ConfigurableApplicationContext context) {
 		this(context, null);
 	}
@@ -121,6 +126,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 	}
 
 	private boolean report(FailureAnalysis analysis, ClassLoader classLoader) {
+		// TODO: 用于 报告异常信息
 		List<FailureAnalysisReporter> reporters = SpringFactoriesLoader.loadFactories(FailureAnalysisReporter.class,
 				classLoader);
 		if (analysis == null || reporters.isEmpty()) {

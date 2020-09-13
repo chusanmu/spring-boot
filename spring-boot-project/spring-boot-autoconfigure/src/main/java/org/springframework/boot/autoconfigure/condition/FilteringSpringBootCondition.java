@@ -88,10 +88,12 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		}
 		List<String> matches = new ArrayList<>(classNames.size());
 		for (String candidate : classNames) {
+			// TODO: 这里 如果匹配，就加到matches中
 			if (classNameFilter.matches(candidate, classLoader)) {
 				matches.add(candidate);
 			}
 		}
+		// TODO: 最后统一返回
 		return matches;
 	}
 
@@ -110,8 +112,14 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		return Class.forName(className);
 	}
 
+	/**
+	 * TODO: 给你一个className判断当前的classpath中是否存在这个class, 这里的枚举挺有意思的
+	 */
 	protected enum ClassNameFilter {
 
+		/**
+		 * TODO: 两种情况存在或者是不存在
+		 */
 		PRESENT {
 
 			@Override
@@ -121,6 +129,9 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 		},
 
+		/**
+		 * 这里相当于搞了两个实现类
+		 */
 		MISSING {
 
 			@Override
@@ -133,11 +144,14 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		abstract boolean matches(String className, ClassLoader classLoader);
 
 		static boolean isPresent(String className, ClassLoader classLoader) {
+			// TODO: 获取classLoader
 			if (classLoader == null) {
 				classLoader = ClassUtils.getDefaultClassLoader();
 			}
 			try {
+				// TODO: 尝试去类加载
 				resolve(className, classLoader);
+				// TODO: 加载到了返回true, 否则返回false
 				return true;
 			}
 			catch (Throwable ex) {
