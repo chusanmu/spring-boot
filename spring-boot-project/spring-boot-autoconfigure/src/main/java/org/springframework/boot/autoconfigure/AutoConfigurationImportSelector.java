@@ -147,7 +147,8 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		checkExcludedClasses(configurations, exclusions);
 		// TODO: 把所有需要排除的类，进行remove
 		configurations.removeAll(exclusions);
-		// TODO: 过滤出符合条件的configuration
+		// TODO: 过滤出符合条件的configuration，其实这里的filter只能做一个初步的判断，并不能做详细的判断
+		// TODO: 它只在selectImport导入的时候，判断这个自动配置类是否需要导入，而之后解析配置，配置@Bean的时候，还会专门为filter
 		configurations = getConfigurationClassFilter().filter(configurations);
 		// TODO: 传播一个事件
 		fireAutoConfigurationImportEvents(configurations, exclusions);
@@ -467,6 +468,9 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	}
 
+	/**
+	 * TODO: 自动配置组，实现了 DeferredImportSelector.Group
+	 */
 	private static class AutoConfigurationGroup
 			implements DeferredImportSelector.Group, BeanClassLoaderAware, BeanFactoryAware, ResourceLoaderAware {
 
@@ -497,15 +501,25 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			this.resourceLoader = resourceLoader;
 		}
 
+		/**
+		 * TODO: 处理注解以及元信息
+		 * @param annotationMetadata
+		 * @param deferredImportSelector
+		 */
 		@Override
 		public void process(AnnotationMetadata annotationMetadata, DeferredImportSelector deferredImportSelector) {
+			// TODO: deferredImportSelector必须是AutoConfigurationImportSelector的实例
 			Assert.state(deferredImportSelector instanceof AutoConfigurationImportSelector,
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
+			// TODO:  获取 AutoConfigurationEntry，这里会去加载所有的自动配置类
+			// TODO: AutoConfigurationEntry 中封装了所有的需要导入的配置文件，以及被排除的配置文件
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 					.getAutoConfigurationEntry(annotationMetadata);
+			// TODO: 加到List中保存起来
 			this.autoConfigurationEntries.add(autoConfigurationEntry);
+			// TODO: 把需要导入的类保存到map，key是importClassName,然后value是元信息
 			for (String importClassName : autoConfigurationEntry.getConfigurations()) {
 				this.entries.putIfAbsent(importClassName, annotationMetadata);
 			}
@@ -513,16 +527,20 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 		@Override
 		public Iterable<Entry> selectImports() {
+			// TODO: 如果list中没有值，则表示没有需要导入类啊，直接返回空List
 			if (this.autoConfigurationEntries.isEmpty()) {
 				return Collections.emptyList();
 			}
+			// TODO: 把所有的排除的className拿到，进行了去重
 			Set<String> allExclusions = this.autoConfigurationEntries.stream()
 					.map(AutoConfigurationEntry::getExclusions).flatMap(Collection::stream).collect(Collectors.toSet());
+			// TODO: 把所有的待导入的自动配置拿到，这里也进行了去重，但是使用的是 LinkedHashSet ，保证了原有的配置文件的 顺序
 			Set<String> processedConfigurations = this.autoConfigurationEntries.stream()
 					.map(AutoConfigurationEntry::getConfigurations).flatMap(Collection::stream)
 					.collect(Collectors.toCollection(LinkedHashSet::new));
+			// TODO: 将所有的需要排除的className再次进行移除
 			processedConfigurations.removeAll(allExclusions);
-
+			// TODO: 自动配置文件 进行排序，@AutoConfigurationOrder ,@AutoConfigureAfter，@AutoConfigureBefore 这三注解在这时候生效，排好序后转成Entry然后返回过去
 			return sortAutoConfigurations(processedConfigurations, getAutoConfigurationMetadata()).stream()
 					.map((importClassName) -> new Entry(this.entries.get(importClassName), importClassName))
 					.collect(Collectors.toList());
@@ -535,12 +553,22 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return this.autoConfigurationMetadata;
 		}
 
+		/**
+		 * TODO: 获取排序后的配置文件列表，这地方很重要，自动装配的配置文件顺序在这儿排好序
+		 * @param configurations
+		 * @param autoConfigurationMetadata
+		 * @return
+		 */
 		private List<String> sortAutoConfigurations(Set<String> configurations,
 				AutoConfigurationMetadata autoConfigurationMetadata) {
 			return new AutoConfigurationSorter(getMetadataReaderFactory(), autoConfigurationMetadata)
 					.getInPriorityOrder(configurations);
 		}
 
+		/**
+		 * TODO: 从容器中把MetadataReaderFactory拿出来
+		 * @return
+		 */
 		private MetadataReaderFactory getMetadataReaderFactory() {
 			try {
 				return this.beanFactory.getBean(SharedMetadataReaderFactoryContextInitializer.BEAN_NAME,

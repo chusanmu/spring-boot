@@ -66,6 +66,9 @@ final class AutoConfigurationMetadataLoader {
 	 */
 	private static class PropertiesAutoConfigurationMetadata implements AutoConfigurationMetadata {
 
+		/**
+		 * TODO: 维护了 autoConfiguration 元信息, spring-autoconfigure-metadata.properties
+		 */
 		private final Properties properties;
 
 		PropertiesAutoConfigurationMetadata(Properties properties) {
@@ -104,6 +107,13 @@ final class AutoConfigurationMetadataLoader {
 			return get(className, key, null);
 		}
 
+		/**
+		 * TODO: 从properties中去进行加载
+		 * @param className the source class
+		 * @param key the meta-data key
+		 * @param defaultValue the default value
+		 * @return
+		 */
 		@Override
 		public String get(String className, String key, String defaultValue) {
 			String value = this.properties.getProperty(className + "." + key);

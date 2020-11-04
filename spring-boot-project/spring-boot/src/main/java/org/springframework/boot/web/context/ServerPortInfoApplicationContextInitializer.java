@@ -33,6 +33,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 把当前webServer对应的端口号加到环境中，方便你在应用中 直接进行注入 @Value("${local.server.port}") 这样直接获取端口号
+ *
  * {@link ApplicationContextInitializer} that sets {@link Environment} properties for the
  * ports that {@link WebServer} servers are actually listening on. The property
  * {@literal "local.server.port"} can be injected directly into tests using
@@ -52,6 +54,10 @@ import org.springframework.util.StringUtils;
 public class ServerPortInfoApplicationContextInitializer implements
 		ApplicationContextInitializer<ConfigurableApplicationContext>, ApplicationListener<WebServerInitializedEvent> {
 
+	/**
+	 * TODO: 直接注册了一个监听器，就是它自己，监听webServerInitializedEvent
+	 * @param applicationContext
+	 */
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		applicationContext.addApplicationListener(this);
@@ -59,7 +65,9 @@ public class ServerPortInfoApplicationContextInitializer implements
 
 	@Override
 	public void onApplicationEvent(WebServerInitializedEvent event) {
+		// TODO: 构建属性名
 		String propertyName = "local." + getName(event.getApplicationContext()) + ".port";
+		// TODO: 把当前端口号 加到环境里面去
 		setPortProperty(event.getApplicationContext(), propertyName, event.getWebServer().getPort());
 	}
 
@@ -69,9 +77,11 @@ public class ServerPortInfoApplicationContextInitializer implements
 	}
 
 	private void setPortProperty(ApplicationContext context, String propertyName, int port) {
+		// TODO: 往运行环境中添加变量
 		if (context instanceof ConfigurableApplicationContext) {
 			setPortProperty(((ConfigurableApplicationContext) context).getEnvironment(), propertyName, port);
 		}
+		// TODO: 如果存在父容器，也会在父容器里面设上这个值
 		if (context.getParent() != null) {
 			setPortProperty(context.getParent(), propertyName, port);
 		}

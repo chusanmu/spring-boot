@@ -102,6 +102,8 @@ public @interface ConditionalOnProperty {
 	String[] value() default {};
 
 	/**
+	 * TODO: 属性前缀
+	 *
 	 * A prefix that should be applied to each property. The prefix automatically ends
 	 * with a dot if not specified. A valid prefix is defined by one or more words
 	 * separated with dots (e.g. {@code "acme.system.feature"}).
@@ -122,6 +124,7 @@ public @interface ConditionalOnProperty {
 	String[] name() default {};
 
 	/**
+	 * TODO: 当前属性对应的，必须得是这个值，否则就是不匹配的
 	 * The string representation of the expected value for the properties. If not
 	 * specified, the property must <strong>not</strong> be equal to {@code false}.
 	 * @return the expected value
@@ -129,6 +132,7 @@ public @interface ConditionalOnProperty {
 	String havingValue() default "";
 
 	/**
+	 * TODO: 默认是false,表示  如果环境中没有这个属性，那么就是不匹配的
 	 * Specify if the condition should match if the property is not set. Defaults to
 	 * {@code false}.
 	 * @return if should match if the property is missing

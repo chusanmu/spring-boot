@@ -43,6 +43,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 此类的作用就是添加一个 beanFactoryPostProcessor, 去校验 @ComponentScan扫描到的包
  * {@link ApplicationContextInitializer} to report warnings for common misconfiguration
  * mistakes.
  *
@@ -54,12 +55,18 @@ public class ConfigurationWarningsApplicationContextInitializer
 
 	private static final Log logger = LogFactory.getLog(ConfigurationWarningsApplicationContextInitializer.class);
 
+	/**
+	 * TODO: 这里也只是加了个 beanFactoryPostProcessor
+	 * @param context
+	 */
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {
+		// TODO: 添加一个BeanFactoryPostProcessor
 		context.addBeanFactoryPostProcessor(new ConfigurationWarningsPostProcessor(getChecks()));
 	}
 
 	/**
+	 * TODO: 在initialize的时候加入了 一个Check
 	 * Returns the checks that should be applied.
 	 * @return the checks to apply
 	 */
@@ -88,8 +95,14 @@ public class ConfigurationWarningsApplicationContextInitializer
 		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		}
 
+		/**
+		 * TODO: 真正执行的时候，会走到这儿
+		 * @param registry
+		 * @throws BeansException
+		 */
 		@Override
 		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+			// TODO: 遍历所有的checks, 然后得到message, 如果有message，那就打印出来一个警告.
 			for (Check check : this.checks) {
 				String message = check.getWarning(registry);
 				if (StringUtils.hasLength(message)) {
@@ -123,12 +136,16 @@ public class ConfigurationWarningsApplicationContextInitializer
 	}
 
 	/**
+	 * TODO: 组件扫描 check
 	 * {@link Check} for {@code @ComponentScan} on problematic package.
 	 */
 	protected static class ComponentScanPackageCheck implements Check {
 
 		private static final Set<String> PROBLEM_PACKAGES;
 
+		/**
+		 * 添加了些不允许扫描的包
+		 */
 		static {
 			Set<String> packages = new HashSet<>();
 			packages.add("org.springframework");
@@ -138,8 +155,11 @@ public class ConfigurationWarningsApplicationContextInitializer
 
 		@Override
 		public String getWarning(BeanDefinitionRegistry registry) {
+			// TODO: 获取所有的@ComponentScan，所扫描的路径
 			Set<String> scannedPackages = getComponentScanningPackages(registry);
+			// TODO: 得到有问题的路径
 			List<String> problematicPackages = getProblematicPackages(scannedPackages);
+			// TODO: 如果没有有问题的，那就啥都不做
 			if (problematicPackages.isEmpty()) {
 				return null;
 			}
@@ -149,8 +169,11 @@ public class ConfigurationWarningsApplicationContextInitializer
 
 		protected Set<String> getComponentScanningPackages(BeanDefinitionRegistry registry) {
 			Set<String> packages = new LinkedHashSet<>();
+			// TODO: 把容器中所有的beanDefinitionNames拿到
 			String[] names = registry.getBeanDefinitionNames();
+			// TODO: 然后进行遍历
 			for (String name : names) {
+				// TODO: 把指定的一个beanDefinition拿到
 				BeanDefinition definition = registry.getBeanDefinition(name);
 				if (definition instanceof AnnotatedBeanDefinition) {
 					AnnotatedBeanDefinition annotatedDefinition = (AnnotatedBeanDefinition) definition;
@@ -161,12 +184,16 @@ public class ConfigurationWarningsApplicationContextInitializer
 		}
 
 		private void addComponentScanningPackages(Set<String> packages, AnnotationMetadata metadata) {
+			// TODO: 尝试获取ComponentScan注解属性值
 			AnnotationAttributes attributes = AnnotationAttributes
 					.fromMap(metadata.getAnnotationAttributes(ComponentScan.class.getName(), true));
+			// TODO: 如果不为空，表示获取到了
 			if (attributes != null) {
+				// TODO: 把ComponentScan中对应的value值 加到 packages中
 				addPackages(packages, attributes.getStringArray("value"));
 				addPackages(packages, attributes.getStringArray("basePackages"));
 				addClasses(packages, attributes.getStringArray("basePackageClasses"));
+				// TODO: 如果ComponentScan中没有指定package, 那么这里添加的是那个类它所在的那个包
 				if (packages.isEmpty()) {
 					packages.add(ClassUtils.getPackageName(metadata.getClassName()));
 				}
@@ -189,7 +216,9 @@ public class ConfigurationWarningsApplicationContextInitializer
 
 		private List<String> getProblematicPackages(Set<String> scannedPackages) {
 			List<String> problematicPackages = new ArrayList<>();
+			// TODO: 看看扫的这个包是不是有问题的，进行遍历
 			for (String scannedPackage : scannedPackages) {
+				// TODO: 如果是有问题的，那就加到 problematicPackages中
 				if (isProblematicPackage(scannedPackage)) {
 					problematicPackages.add(getDisplayName(scannedPackage));
 				}
@@ -198,9 +227,11 @@ public class ConfigurationWarningsApplicationContextInitializer
 		}
 
 		private boolean isProblematicPackage(String scannedPackage) {
+			// TODO: 扫描的包为null或者为空，那肯定是有问题的，
 			if (scannedPackage == null || scannedPackage.isEmpty()) {
 				return true;
 			}
+			// TODO: 如果扫的包是 org.springframework， org,这俩，那么也被认为是有问题的
 			return PROBLEM_PACKAGES.contains(scannedPackage);
 		}
 

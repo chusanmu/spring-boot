@@ -52,29 +52,49 @@ class AutoConfigurationSorter {
 		this.autoConfigurationMetadata = autoConfigurationMetadata;
 	}
 
+	/**
+	 * TODO: 获取排好序的自动装配配置列表
+	 *
+	 * @param classNames
+	 * @return
+	 */
 	List<String> getInPriorityOrder(Collection<String> classNames) {
+		// TODO: AutoConfigurationClasses 此类主要的作用就是解析元数据，spring-autoconfigure-metadata.properties读取元信息
 		AutoConfigurationClasses classes = new AutoConfigurationClasses(this.metadataReaderFactory,
 				this.autoConfigurationMetadata, classNames);
+		// TODO: 创建一个新的list
 		List<String> orderedClassNames = new ArrayList<>(classNames);
 		// Initially sort alphabetically
+		// TODO: 首次排序，进行排序，这里首次排序是根据name去排序的，根据自然顺序排序，例如 a,b,c 这样...
 		Collections.sort(orderedClassNames);
 		// Then sort by order
+		// TODO: 第二轮排序，根据AutoConfigureOrder进行排序，优先级越高的，排在前面
 		orderedClassNames.sort((o1, o2) -> {
 			int i1 = classes.get(o1).getOrder();
 			int i2 = classes.get(o2).getOrder();
 			return Integer.compare(i1, i2);
 		});
 		// Then respect @AutoConfigureBefore @AutoConfigureAfter
+		// TODO: 第三轮排序 根据  @AutoConfigureBefore @AutoConfigureAfter 这俩注解进行排序
 		orderedClassNames = sortByAnnotation(classes, orderedClassNames);
+		// TODO: 最后把排好序的names返回回去
 		return orderedClassNames;
 	}
 
+	/**
+	 * TODO: 根据 @AutoConfigureBefore @AutoConfigureAfter 这俩注解进行排序
+	 * @param classes
+	 * @param classNames
+	 * @return
+	 */
 	private List<String> sortByAnnotation(AutoConfigurationClasses classes, List<String> classNames) {
 		List<String> toSort = new ArrayList<>(classNames);
 		toSort.addAll(classes.getAllNames());
 		Set<String> sorted = new LinkedHashSet<>();
 		Set<String> processing = new LinkedHashSet<>();
+		// TODO: 只要toSort不为空，就去处理排序
 		while (!toSort.isEmpty()) {
+			// TODO: 根据注解进行排序
 			doSortByAfterAnnotation(classes, toSort, sorted, processing, null);
 		}
 		sorted.retainAll(classNames);
@@ -108,19 +128,23 @@ class AutoConfigurationSorter {
 		}
 
 		Set<String> getAllNames() {
+			// TODO: 拿到所有的需要自动装配的类
 			return this.classes.keySet();
 		}
 
 		private void addToClasses(MetadataReaderFactory metadataReaderFactory,
 				AutoConfigurationMetadata autoConfigurationMetadata, Collection<String> classNames, boolean required) {
+			// TODO: 把所有的classNames进行遍历
 			for (String className : classNames) {
 				if (!this.classes.containsKey(className)) {
 					AutoConfigurationClass autoConfigurationClass = new AutoConfigurationClass(className,
 							metadataReaderFactory, autoConfigurationMetadata);
 					boolean available = autoConfigurationClass.isAvailable();
+					// TODO: 只要能找到，或者是必须的，就放到classes中缓存起来
 					if (required || available) {
 						this.classes.put(className, autoConfigurationClass);
 					}
+					// TODO: 这里相当于一个递归，二分查找处理
 					if (available) {
 						addToClasses(metadataReaderFactory, autoConfigurationMetadata,
 								autoConfigurationClass.getBefore(), false);
@@ -147,18 +171,40 @@ class AutoConfigurationSorter {
 
 	}
 
+	/**
+	 * TODO: 维护了自动装配class的元信息吧
+	 *
+	 */
 	private static class AutoConfigurationClass {
 
+		/**
+		 * TODO: 当前自动装配的全类名
+		 */
 		private final String className;
 
+		/**
+		 * TODO: metadataReaderFactory用来获取metadataReader
+		 */
 		private final MetadataReaderFactory metadataReaderFactory;
 
+		/**
+		 * TODO: 维护了当前自动配置类的元信息
+		 */
 		private final AutoConfigurationMetadata autoConfigurationMetadata;
 
+		/**
+		 * TODO: 维护了当前自动配置类的注解元信息
+		 */
 		private volatile AnnotationMetadata annotationMetadata;
 
+		/**
+		 * TODO: 保存了需要在它之前进行自动配置的类
+		 */
 		private volatile Set<String> before;
 
+		/**
+		 * TODO: 保存了需要在它之后进行自动配置的类
+		 */
 		private volatile Set<String> after;
 
 		AutoConfigurationClass(String className, MetadataReaderFactory metadataReaderFactory,
@@ -182,6 +228,8 @@ class AutoConfigurationSorter {
 
 		Set<String> getBefore() {
 			if (this.before == null) {
+				// TODO: 如果元信息配置文件中包含这个class,则从元信息中读取 这个className对应的 AutoConfigureBefore对应的类名然后返回，否则就去解析
+				// TODO: 这个类上 注解里面对应的值
 				this.before = (wasProcessed() ? this.autoConfigurationMetadata.getSet(this.className,
 						"AutoConfigureBefore", Collections.emptySet()) : getAnnotationValue(AutoConfigureBefore.class));
 			}
@@ -196,33 +244,51 @@ class AutoConfigurationSorter {
 			return this.after;
 		}
 
+		/**
+		 * TODO: 获取order, 先尝试从元信息中获取，如果元信息中没有，则从当前配置类的 @AutoConfigureOrder 中获取
+		 * @return
+		 */
 		private int getOrder() {
 			if (wasProcessed()) {
 				return this.autoConfigurationMetadata.getInteger(this.className, "AutoConfigureOrder",
 						AutoConfigureOrder.DEFAULT_ORDER);
 			}
+			// TODO: 直接从注解中拿
 			Map<String, Object> attributes = getAnnotationMetadata()
 					.getAnnotationAttributes(AutoConfigureOrder.class.getName());
 			return (attributes != null) ? (Integer) attributes.get("value") : AutoConfigureOrder.DEFAULT_ORDER;
 		}
 
 		private boolean wasProcessed() {
+			// TODO: autoConfigurationMetadata 不等于空，并且 autoConfigurationMetadata中存在这个className代表的key
 			return (this.autoConfigurationMetadata != null
 					&& this.autoConfigurationMetadata.wasProcessed(this.className));
 		}
 
+		/**
+		 * TODO: 获取注解里面的值
+		 * @param annotation
+		 * @return
+		 */
 		private Set<String> getAnnotationValue(Class<?> annotation) {
+			// TODO: 获取  AutoConfigureAfter AutoConfigureBefore 里面的值，这里 注意，第二个参数传了个true，表示class会转为string
 			Map<String, Object> attributes = getAnnotationMetadata().getAnnotationAttributes(annotation.getName(),
 					true);
 			if (attributes == null) {
 				return Collections.emptySet();
 			}
 			Set<String> value = new LinkedHashSet<>();
+			// TODO: 把属性值加进去
 			Collections.addAll(value, (String[]) attributes.get("value"));
 			Collections.addAll(value, (String[]) attributes.get("name"));
 			return value;
 		}
 
+		/**
+		 * TODO: 获取注解元信息，先拿到MetadataReader,  然后利用metadataReader获取annotationMetadata
+		 *
+		 * @return
+		 */
 		private AnnotationMetadata getAnnotationMetadata() {
 			if (this.annotationMetadata == null) {
 				try {

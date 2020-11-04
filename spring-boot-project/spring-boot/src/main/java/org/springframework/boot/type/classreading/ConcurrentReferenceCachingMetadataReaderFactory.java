@@ -28,6 +28,7 @@ import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
+ * TODO: 对MetadataReader进行了缓存
  * Caching implementation of the {@link MetadataReaderFactory} interface backed by a
  * {@link ConcurrentReferenceHashMap}, caching {@link MetadataReader} per Spring
  * {@link Resource} handle (i.e. per ".class" file).

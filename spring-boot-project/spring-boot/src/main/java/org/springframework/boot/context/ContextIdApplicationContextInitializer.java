@@ -26,6 +26,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 主要用来注册一个bean, ContextId 这个bean
  * {@link ApplicationContextInitializer} that sets the Spring
  * {@link ApplicationContext#getId() ApplicationContext ID}. The
  * {@code spring.application.name} property is used to create the ID. If the property is
@@ -51,16 +52,23 @@ public class ContextIdApplicationContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
+		// TODO: 尝试获得ContextId
 		ContextId contextId = getContextId(applicationContext);
+		// TODO: 把contextId从容器中拿到
 		applicationContext.setId(contextId.getId());
+		// TODO: 然后向容器注册这个bean
 		applicationContext.getBeanFactory().registerSingleton(ContextId.class.getName(), contextId);
 	}
 
 	private ContextId getContextId(ConfigurableApplicationContext applicationContext) {
+		// TODO: 先把它的父容器拿到
 		ApplicationContext parent = applicationContext.getParent();
+		// TODO: 如果父容器不等于空，并且包括这个类型的bean
 		if (parent != null && parent.containsBean(ContextId.class.getName())) {
+			// TODO: 那就把它拿出来，创建一个ChildId
 			return parent.getBean(ContextId.class).createChildId();
 		}
+		// TODO: 否则直接创建，取应用名，如果没有应用名，则取默认值application
 		return new ContextId(getApplicationId(applicationContext.getEnvironment()));
 	}
 

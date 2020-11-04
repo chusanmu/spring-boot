@@ -49,26 +49,38 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		// Split the work and perform half in a background thread if more than one
 		// processor is available. Using a single additional thread seems to offer the
 		// best performance. More threads make things worse.
+		// TODO: 这里考虑了进行任务的分隔，如果你的配置文件个数大于1，并且处理器个数大于1
 		if (autoConfigurationClasses.length > 1 && Runtime.getRuntime().availableProcessors() > 1) {
+			// TODO: 这里进行新开线程去处理
 			return resolveOutcomesThreaded(autoConfigurationClasses, autoConfigurationMetadata);
 		}
 		else {
+			// TODO: 否则直接去处理
 			OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, 0,
 					autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());
+			// TODO: 直接拿到解析结果
 			return outcomesResolver.resolveOutcomes();
 		}
 	}
 
 	private ConditionOutcome[] resolveOutcomesThreaded(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
+		// TODO: 这里挺有意思的，将所有的配置文件一分为二
 		int split = autoConfigurationClasses.length / 2;
+		// TODO: 创建一个 OutcomesResolver，然后交给一个线程去处理, 他把全部的autoConfigurationClasses，分成了两半
+		// TODO: 第一部分 用一个线程去处理
 		OutcomesResolver firstHalfResolver = createOutcomesResolver(autoConfigurationClasses, 0, split,
 				autoConfigurationMetadata);
+		// TODO: 第二部分依旧主线程去处理
 		OutcomesResolver secondHalfResolver = new StandardOutcomesResolver(autoConfigurationClasses, split,
 				autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());
+		// TODO: 第二部分去拿它的输出结果
 		ConditionOutcome[] secondHalf = secondHalfResolver.resolveOutcomes();
+		// TODO: 然后第一部分，线程那部分也去拿输出结果
 		ConditionOutcome[] firstHalf = firstHalfResolver.resolveOutcomes();
+		// TODO: 用来收集结果
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
+		// TODO: 把两次输出结果，分别拷贝到outcomes数组中
 		System.arraycopy(firstHalf, 0, outcomes, 0, firstHalf.length);
 		System.arraycopy(secondHalf, 0, outcomes, split, secondHalf.length);
 		return outcomes;
@@ -76,9 +88,11 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	private OutcomesResolver createOutcomesResolver(String[] autoConfigurationClasses, int start, int end,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
+		// TODO: 创建了一个标准的StandardOutcomesResolver，然后交给了一个线程去处理
 		OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, start, end,
 				autoConfigurationMetadata, getBeanClassLoader());
 		try {
+			// TODO: 交给了一个线程去处理
 			return new ThreadedOutcomesResolver(outcomesResolver);
 		}
 		catch (AccessControlException ex) {
@@ -161,6 +175,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		private volatile ConditionOutcome[] outcomes;
 
 		private ThreadedOutcomesResolver(OutcomesResolver outcomesResolver) {
+			// TODO: 交给了一个线程去处理，之后启动这个线程
 			this.thread = new Thread(() -> this.outcomes = outcomesResolver.resolveOutcomes());
 			this.thread.start();
 		}
@@ -168,6 +183,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		@Override
 		public ConditionOutcome[] resolveOutcomes() {
 			try {
+				// TODO: 主线程调用了thread.join,等待thread线程去执行完毕，然后把结果输出
 				this.thread.join();
 			}
 			catch (InterruptedException ex) {
@@ -199,6 +215,10 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			this.beanClassLoader = beanClassLoader;
 		}
 
+		/**
+		 * TODO: 解析配置文件，这里有个起始角标，判断它是否合法，需要导入
+		 * @return
+		 */
 		@Override
 		public ConditionOutcome[] resolveOutcomes() {
 			return getOutcomes(this.autoConfigurationClasses, this.start, this.end, this.autoConfigurationMetadata);
@@ -206,12 +226,17 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 		private ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, int start, int end,
 				AutoConfigurationMetadata autoConfigurationMetadata) {
+			// TODO: 创建一个指定长度的数组
 			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];
 			for (int i = start; i < end; i++) {
+				// TODO: 拿到具体的配置文件
 				String autoConfigurationClass = autoConfigurationClasses[i];
 				if (autoConfigurationClass != null) {
+					// TODO: 如果该class不为空，则去获取 它的 ConditionalOnClass 注解 的 属性
 					String candidates = autoConfigurationMetadata.get(autoConfigurationClass, "ConditionalOnClass");
+					// TODO: 如果它的这个属性也不为空
 					if (candidates != null) {
+						// TODO: 记录输出
 						outcomes[i - start] = getOutcome(candidates);
 					}
 				}
@@ -221,12 +246,15 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 		private ConditionOutcome getOutcome(String candidates) {
 			try {
+				// TODO: 看它包不包含逗号，不包含逗号就直接去处理
 				if (!candidates.contains(",")) {
 					return getOutcome(candidates, this.beanClassLoader);
 				}
+				// TODO: 否则就用逗号拆分一下，然后去遍历处理
 				for (String candidate : StringUtils.commaDelimitedListToStringArray(candidates)) {
 					ConditionOutcome outcome = getOutcome(candidate, this.beanClassLoader);
 					if (outcome != null) {
+						// TODO: 直接返回结果
 						return outcome;
 					}
 				}
@@ -238,7 +266,9 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		}
 
 		private ConditionOutcome getOutcome(String className, ClassLoader classLoader) {
+			// TODO: 去尝试匹配，如果它是缺少的，返回了true , 那就是不匹配呗
 			if (ClassNameFilter.MISSING.matches(className, classLoader)) {
+				// TODO: 把不匹配结果输出
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)
 						.didNotFind("required class").items(Style.QUOTE, className));
 			}

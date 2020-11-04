@@ -53,6 +53,7 @@ class SharedMetadataReaderFactoryContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
+		// TODO: 向applicationContext容器里面添加了一个beanFactoryPostProcessor -----> CachingMetadataReaderFactoryPostProcessor
 		applicationContext.addBeanFactoryPostProcessor(new CachingMetadataReaderFactoryPostProcessor());
 	}
 
@@ -72,6 +73,7 @@ class SharedMetadataReaderFactoryContextInitializer
 		@Override
 		public int getOrder() {
 			// Must happen before the ConfigurationClassPostProcessor is created
+			// TODO: 这里可以看出它的优先级是最高的，还专门备注了，要比 ConfigurationClassPostProcessor 的优先级高
 			return Ordered.HIGHEST_PRECEDENCE;
 		}
 
@@ -79,6 +81,12 @@ class SharedMetadataReaderFactoryContextInitializer
 		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		}
 
+		/**
+		 * TODO: 入口点
+		 *  主要注册了一个bean ShareMetadataReaderFactoryBean
+		 * @param registry
+		 * @throws BeansException
+		 */
 		@Override
 		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 			register(registry);

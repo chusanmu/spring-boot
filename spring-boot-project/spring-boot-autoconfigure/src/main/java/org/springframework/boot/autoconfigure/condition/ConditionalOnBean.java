@@ -101,6 +101,7 @@ public @interface ConditionalOnBean {
 	SearchStrategy search() default SearchStrategy.ALL;
 
 	/**
+	 * TODO: 兼容泛型的情况
 	 * Additional classes that may contain the specified bean types within their generic
 	 * parameters. For example, an annotation declaring {@code value=Name.class} and
 	 * {@code parameterizedContainer=NameRegistration.class} would detect both

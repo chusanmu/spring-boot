@@ -48,6 +48,7 @@ public class RSocketPortInfoApplicationContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
+		// TODO: 这个就直接加了个listener
 		applicationContext.addApplicationListener(new Listener(applicationContext));
 	}
 
@@ -61,6 +62,10 @@ public class RSocketPortInfoApplicationContextInitializer
 			this.applicationContext = applicationContext;
 		}
 
+		/**
+		 * TODO: 触发这个事件的时候，把event中对应的port加到环境变量里面去
+		 * @param event
+		 */
 		@Override
 		public void onApplicationEvent(RSocketServerInitializedEvent event) {
 			if (event.getServer().address() != null) {
