@@ -62,6 +62,7 @@ public final class LazyInitializationBeanFactoryPostProcessor implements BeanFac
 			AbstractBeanDefinition beanDefinition) {
 		// TODO: 拿到它的lazyInit属性
 		Boolean lazyInit = beanDefinition.getLazyInit();
+		// TODO: 如果lazyInit不为空，表示不需要懒加载
 		if (lazyInit != null) {
 			return;
 		}

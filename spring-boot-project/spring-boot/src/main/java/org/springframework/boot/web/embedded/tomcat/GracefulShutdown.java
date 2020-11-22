@@ -94,6 +94,7 @@ final class GracefulShutdown {
 
 	private boolean isActive(Container context) {
 		try {
+			// TODO: 判断关闭挡板后 剩余请求数
 			if (((StandardContext) context).getInProgressAsyncCount() > 0) {
 				return true;
 			}

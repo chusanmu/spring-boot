@@ -83,12 +83,20 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 				.multicastEvent(new ApplicationEnvironmentPreparedEvent(this.application, this.args, environment));
 	}
 
+	/**
+	 * TODO: 触发事件 如果所有的initialized调用完毕，然后会触发此事件
+	 * @param context the application context
+	 */
 	@Override
 	public void contextPrepared(ConfigurableApplicationContext context) {
 		this.initialMulticaster
 				.multicastEvent(new ApplicationContextInitializedEvent(this.application, this.args, context));
 	}
 
+	/**
+	 * TODO: 这里发布 ApplicationPreparedEvent 事件, 这时候 已经把 primary source 加到 AnnotatedBeanDefinitionReader 中去了
+	 * @param context the application context
+	 */
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
 		for (ApplicationListener<?> listener : this.application.getListeners()) {
@@ -100,12 +108,23 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		this.initialMulticaster.multicastEvent(new ApplicationPreparedEvent(this.application, this.args, context));
 	}
 
+	/**
+	 * TODO: refresh完毕之后，所有的bean都加载进容器
+	 *
+	 * @param context the application context.
+	 */
 	@Override
 	public void started(ConfigurableApplicationContext context) {
+		// TODO: 发布ApplicationStartedEvent事件，表示容器启动成功
 		context.publishEvent(new ApplicationStartedEvent(this.application, this.args, context));
 		AvailabilityChangeEvent.publish(context, LivenessState.CORRECT);
 	}
 
+	/**
+	 * TODO: 到这步 我们的IOC容器 web server也都启动成功了，程序正在运行中
+	 *
+	 * @param context the application context.
+	 */
 	@Override
 	public void running(ConfigurableApplicationContext context) {
 		context.publishEvent(new ApplicationReadyEvent(this.application, this.args, context));

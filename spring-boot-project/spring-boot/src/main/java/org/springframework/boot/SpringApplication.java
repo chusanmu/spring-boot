@@ -415,13 +415,14 @@ public class SpringApplication {
 		// TODO: 拿到当前容器的BeanFactory
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		// TODO: 注册了一个bean，applicationArguments封装了传进来的参数
+		// TODO:  这里注册了两个bean，一个是对命令行参数的封装，一个banner，也加入到容器里面了
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
 			// TODO: 把banner也注册进去
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
 		if (beanFactory instanceof DefaultListableBeanFactory) {
-			// TODO: 配置是否允许beanDefinition被覆盖
+			// TODO: 配置是否允许beanDefinition被覆盖, 默认不允许被覆盖
 			((DefaultListableBeanFactory) beanFactory)
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
@@ -445,6 +446,7 @@ public class SpringApplication {
 		refresh((ApplicationContext) context);
 		if (this.registerShutdownHook) {
 			try {
+				// TODO: 注册关闭钩子
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {
