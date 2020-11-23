@@ -172,6 +172,13 @@ public class ServletRegistrationBean<T extends Servlet> extends DynamicRegistrat
 		return "servlet " + getServletName();
 	}
 
+	/**
+	 * TODO: 这里就可以清晰的看到servletContext添加servlet，将servlet加到servletContext中
+	 *
+	 * @param description
+	 * @param servletContext
+	 * @return
+	 */
 	@Override
 	protected ServletRegistration.Dynamic addRegistration(String description, ServletContext servletContext) {
 		String name = getServletName();

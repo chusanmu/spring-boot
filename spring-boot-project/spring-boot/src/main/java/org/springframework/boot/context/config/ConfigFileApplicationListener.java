@@ -176,6 +176,12 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 
 	private int order = DEFAULT_ORDER;
 
+	/**
+	 *  TODO 仅支持处理这两种事件 ApplicationEnvironmentPreparedEvent,ApplicationPreparedEvent
+	 *
+	 * @param eventType
+	 * @return
+	 */
 	@Override
 	public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
 		return ApplicationEnvironmentPreparedEvent.class.isAssignableFrom(eventType)
@@ -184,6 +190,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+		// TODO: 对这两种事件 分别进行处理
 		if (event instanceof ApplicationEnvironmentPreparedEvent) {
 			onApplicationEnvironmentPreparedEvent((ApplicationEnvironmentPreparedEvent) event);
 		}
@@ -193,14 +200,21 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 	}
 
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
+		// TODO: 通过SPI的方式加载所有的EnvironmentPostProcessor实现
 		List<EnvironmentPostProcessor> postProcessors = loadPostProcessors();
+		// TODO: 把它自己也加进去
 		postProcessors.add(this);
 		AnnotationAwareOrderComparator.sort(postProcessors);
+		// TODO: 调用postProcessEnvironment 方法
 		for (EnvironmentPostProcessor postProcessor : postProcessors) {
 			postProcessor.postProcessEnvironment(event.getEnvironment(), event.getSpringApplication());
 		}
 	}
 
+	/**
+	 * TODO: 把所有的EnvironmentPostProcessor 加载进容器
+	 * @return
+	 */
 	List<EnvironmentPostProcessor> loadPostProcessors() {
 		return SpringFactoriesLoader.loadFactories(EnvironmentPostProcessor.class, getClass().getClassLoader());
 	}

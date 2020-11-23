@@ -80,10 +80,13 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 	public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
 			Class<? extends ServletContextInitializer>... initializerTypes) {
 		this.initializers = new LinkedMultiValueMap<>();
+		// TODO: 判断你有没有传initializerTypes，如果没传，那么就只找 ServletContextInitializer
 		this.initializerTypes = (initializerTypes.length != 0) ? Arrays.asList(initializerTypes)
 				: Collections.singletonList(ServletContextInitializer.class);
+		// TODO: 添加servletContextInitializerBeans
 		addServletContextInitializerBeans(beanFactory);
 		addAdaptableBeans(beanFactory);
+		// TODO: 把所有的 ServletContextInitializer 拿出来，然后进行排个序
 		List<ServletContextInitializer> sortedInitializers = this.initializers.values().stream()
 				.flatMap((value) -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
 				.collect(Collectors.toList());
@@ -91,15 +94,29 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		logMappings(this.initializers);
 	}
 
+	/**
+	 * TODO: 这时候就去容器里面去查找了， 查找符合这种类型initializerTypes的bean
+	 *
+	 * @param beanFactory
+	 */
 	private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
 		for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
+			// TODO: 这里 就可以很清晰的看到 从beanFactory容器中去查找initializerType这个类型的bean，其实就是 ServletContextInitializer 类型的bean
+			// TODO: 这个bean的子类 有 servlet , listener , filter等，如果你在容器里面添加了，这时候就会被扫描进来
 			for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory,
 					initializerType)) {
+				// TODO: 添加servlet filter listener等
 				addServletContextInitializerBean(initializerBean.getKey(), initializerBean.getValue(), beanFactory);
 			}
 		}
 	}
 
+	/**
+	 * 这时候 去添加 Servlet Filter Listener等
+	 * @param beanName
+	 * @param initializer
+	 * @param beanFactory
+	 */
 	private void addServletContextInitializerBean(String beanName, ServletContextInitializer initializer,
 			ListableBeanFactory beanFactory) {
 		if (initializer instanceof ServletRegistrationBean) {

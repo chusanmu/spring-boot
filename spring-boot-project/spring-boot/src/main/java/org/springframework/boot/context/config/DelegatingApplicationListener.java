@@ -54,11 +54,13 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (event instanceof ApplicationEnvironmentPreparedEvent) {
+			// TODO: 从 环境中 加载 context.listener.classes 这个属性，把这个属性值 用逗号分隔开，加到listeners中 然后触发事件
 			List<ApplicationListener<ApplicationEvent>> delegates = getListeners(
 					((ApplicationEnvironmentPreparedEvent) event).getEnvironment());
 			if (delegates.isEmpty()) {
 				return;
 			}
+			// TODO: 加到listeners中之后 触发事件
 			this.multicaster = new SimpleApplicationEventMulticaster();
 			for (ApplicationListener<ApplicationEvent> listener : delegates) {
 				this.multicaster.addApplicationListener(listener);
@@ -74,6 +76,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 		if (environment == null) {
 			return Collections.emptyList();
 		}
+		// TODO: 获取这个property对应的classNames,然后以逗号分隔 进行遍历，之后加载到它的class，还会进行排序
 		String classNames = environment.getProperty(PROPERTY_NAME);
 		List<ApplicationListener<ApplicationEvent>> listeners = new ArrayList<>();
 		if (StringUtils.hasLength(classNames)) {

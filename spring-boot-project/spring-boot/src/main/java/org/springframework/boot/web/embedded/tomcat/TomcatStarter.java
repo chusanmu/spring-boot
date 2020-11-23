@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 /**
+ * TODO： 在tomcat启动成功之后，会进行回调，会对这个类进行回调
+ *
  * {@link ServletContainerInitializer} used to trigger {@link ServletContextInitializer
  * ServletContextInitializers} and track startup errors.
  *
@@ -49,6 +51,7 @@ class TomcatStarter implements ServletContainerInitializer {
 	@Override
 	public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
 		try {
+			// TODO: 挨个执行所有initializer的onStartup方法
 			for (ServletContextInitializer initializer : this.initializers) {
 				initializer.onStartup(servletContext);
 			}

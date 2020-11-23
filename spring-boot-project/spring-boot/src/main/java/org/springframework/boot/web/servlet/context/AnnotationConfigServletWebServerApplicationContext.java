@@ -35,6 +35,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * TODO: 一般情况下 我们启动的IOC容器 就是它
+ *
  * {@link ServletWebServerApplicationContext} that accepts annotated classes as input - in
  * particular {@link org.springframework.context.annotation.Configuration @Configuration}
  * -annotated classes, but also plain {@link Component @Component} classes and JSR-330
@@ -70,6 +72,7 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
+		// TODO: bean扫描两大门将
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}

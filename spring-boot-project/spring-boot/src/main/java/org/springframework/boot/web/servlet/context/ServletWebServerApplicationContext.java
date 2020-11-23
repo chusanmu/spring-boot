@@ -143,6 +143,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			super.refresh();
 		}
 		catch (RuntimeException ex) {
+			// TODO: 如果在refresh的过程中 有异常抛出，就把web server关掉
 			WebServer webServer = this.webServer;
 			if (webServer != null) {
 				webServer.stop();
@@ -220,6 +221,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	}
 
 	/**
+	 * TODO: 获取ServletContextInitializer, 这里直接返回了一个lambada表达式
+	 *
 	 * Returns the {@link ServletContextInitializer} that will be used to complete the
 	 * setup of this {@link WebApplicationContext}.
 	 * @return the self initializer
@@ -229,10 +232,17 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		return this::selfInitialize;
 	}
 
+	/**
+	 * todo: 其实就是返回了一个这个方法， 它就是一个ServletContextInitializer, 比较重要的一个方法
+	 *
+	 * @param servletContext
+	 * @throws ServletException
+	 */
 	private void selfInitialize(ServletContext servletContext) throws ServletException {
 		prepareWebApplicationContext(servletContext);
 		registerApplicationScope(servletContext);
 		WebApplicationContextUtils.registerEnvironmentBeans(getBeanFactory(), servletContext);
+		// TODO: 遍历拿到的所有的servletContextInitializer，然后调用它的onStartup方法
 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
 			beans.onStartup(servletContext);
 		}

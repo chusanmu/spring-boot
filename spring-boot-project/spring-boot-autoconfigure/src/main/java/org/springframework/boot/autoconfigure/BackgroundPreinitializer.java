@@ -35,6 +35,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 
 /**
+ * TODO: 启动一个后台进行对一些类进行预热，如 VlidationInitializer, JacksonInitializer，因为这些组件有第一次惩罚的特点，并且首次初始化还比较耗时，所以使用后台线程进行预热
+ *
  * {@link ApplicationListener} to trigger early initialization in a background thread of
  * time consuming tasks.
  * <p>
@@ -91,6 +93,7 @@ public class BackgroundPreinitializer implements ApplicationListener<SpringAppli
 
 				@Override
 				public void run() {
+					// TODO: 对这些组件进行预热
 					runSafely(new ConversionServiceInitializer());
 					runSafely(new ValidationInitializer());
 					runSafely(new MessageConverterInitializer());
