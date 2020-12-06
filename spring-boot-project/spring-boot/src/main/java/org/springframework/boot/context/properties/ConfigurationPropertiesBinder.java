@@ -185,16 +185,19 @@ class ConfigurationPropertiesBinder {
 	}
 
 	static void register(BeanDefinitionRegistry registry) {
+		// TODO: 如果当前容器中不存在 ConfigurationPropertiesBinder.Factory 这时候进行注册beanDefinition
 		if (!registry.containsBeanDefinition(FACTORY_BEAN_NAME)) {
 			GenericBeanDefinition definition = new GenericBeanDefinition();
 			definition.setBeanClass(ConfigurationPropertiesBinder.Factory.class);
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(ConfigurationPropertiesBinder.FACTORY_BEAN_NAME, definition);
 		}
+		// TODO: 如果当前容器中不存在这个bean, 也会进行注册 然后指定它的factoryBeanName，指定factoryMethod方法
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
 			GenericBeanDefinition definition = new GenericBeanDefinition();
 			definition.setBeanClass(ConfigurationPropertiesBinder.class);
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			// TODO: 指定factoryBeanName，这样在创建bean的时候，会直接利用工厂方法创建
 			definition.setFactoryBeanName(FACTORY_BEAN_NAME);
 			definition.setFactoryMethodName("create");
 			registry.registerBeanDefinition(ConfigurationPropertiesBinder.BEAN_NAME, definition);

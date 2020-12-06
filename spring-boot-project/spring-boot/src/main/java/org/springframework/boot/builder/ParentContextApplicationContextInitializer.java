@@ -25,6 +25,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 
 /**
+ * TODO: 在用到spring cloud的时候，spring cloud会创建一个BootstrapApplicationContext，然后会添加一个initializer，从而触发设置父容器
+ *
  * {@link ApplicationContextInitializer} for setting the parent context. Also publishes
  * {@link ParentContextAvailableEvent} when the context is refreshed to signal to other
  * listeners that the context is available and has a parent.
@@ -54,8 +56,12 @@ public class ParentContextApplicationContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
+		// TODO: 如果你的applicationContext和这个parent不相同，然后就去设置父容器了
 		if (applicationContext != this.parent) {
+			// TODO: 其实就是设置bootStrapApplication 为当前applicationContext的父容器
 			applicationContext.setParent(this.parent);
+			// TODO: 最后加了一个ContextClosedEvent 监听
+			// TODO: 主要用来发布项目中存在父子容器事件
 			applicationContext.addApplicationListener(EventPublisher.INSTANCE);
 		}
 	}

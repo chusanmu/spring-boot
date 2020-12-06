@@ -219,8 +219,14 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 		return SpringFactoriesLoader.loadFactories(EnvironmentPostProcessor.class, getClass().getClassLoader());
 	}
 
+	/**
+	 * TODO: 它自己也是一个postProcessor
+	 * @param environment the environment to post-process
+	 * @param application the application to which the environment belongs
+	 */
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		// TODO: 开始进行处理，传入了resourceLoader, 用于加载资源
 		addPropertySources(environment, application.getResourceLoader());
 	}
 
@@ -341,6 +347,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			this.environment = environment;
 			this.placeholdersResolver = new PropertySourcesPlaceholdersResolver(this.environment);
 			this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader(null);
+			// TODO: 加载propertySourceLoader的具体加载器，也能是Yml格式也可能是properties格式
 			this.propertySourceLoaders = SpringFactoriesLoader.loadFactories(PropertySourceLoader.class,
 					getClass().getClassLoader());
 		}
@@ -352,14 +359,21 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 						this.processedProfiles = new LinkedList<>();
 						this.activatedProfiles = false;
 						this.loaded = new LinkedHashMap<>();
+						// 初始化所有的配置文件
 						initializeProfiles();
+						// TODO: 当profiles不为空时 开始处理
 						while (!this.profiles.isEmpty()) {
+							// 弹出来一个profile
 							Profile profile = this.profiles.poll();
+							// TODO: 判断是否是默认的profile
 							if (isDefaultProfile(profile)) {
+								// TODO:  将当前的profile加到environment中
 								addProfileToEnvironment(profile.getName());
 							}
+							// TODO: 这个方法就是去加载我们的profile
 							load(profile, this::getPositiveProfileFilter,
 									addToLoaded(MutablePropertySources::addLast, false));
+							// TODO: 标记为已处理
 							this.processedProfiles.add(profile);
 						}
 						load(null, this::getNegativeProfileFilter, addToLoaded(MutablePropertySources::addFirst, true));
@@ -378,14 +392,19 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			// first so that it is processed first and has lowest priority.
 			this.profiles.add(null);
 			Binder binder = Binder.get(this.environment);
+			// TODO: 获取激活的配置文件
 			Set<Profile> activatedViaProperty = getProfiles(binder, ACTIVE_PROFILES_PROPERTY);
+			// TODO: 获取include的配置文件
 			Set<Profile> includedViaProperty = getProfiles(binder, INCLUDE_PROFILES_PROPERTY);
+			// 获取其余的active profile
 			List<Profile> otherActiveProfiles = getOtherActiveProfiles(activatedViaProperty, includedViaProperty);
+			// TODO: 最后全部加进去，加到profiles中
 			this.profiles.addAll(otherActiveProfiles);
 			// Any pre-existing active profiles set via property sources (e.g.
 			// System properties) take precedence over those added in config files.
 			this.profiles.addAll(includedViaProperty);
 			addActiveProfiles(activatedViaProperty);
+			// TODO: 如果当前profiles的个数还是1，那么说明了只有null profile
 			if (this.profiles.size() == 1) { // only has null profile
 				for (String defaultProfileName : this.environment.getDefaultProfiles()) {
 					Profile defaultProfile = new Profile(defaultProfileName, true);
@@ -394,6 +413,13 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			}
 		}
 
+		/**
+		 * todo: 获取其他的一些激活的配置文件，获取environment中的active配置文件，但是不存在与spring.profiles.active
+		 *
+		 * @param activatedViaProperty
+		 * @param includedViaProperty
+		 * @return
+		 */
 		private List<Profile> getOtherActiveProfiles(Set<Profile> activatedViaProperty,
 				Set<Profile> includedViaProperty) {
 			return Arrays.stream(this.environment.getActiveProfiles()).map(Profile::new).filter(
@@ -668,6 +694,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 		private Set<Profile> asProfileSet(String[] profileNames) {
 			List<Profile> profiles = new ArrayList<>();
 			for (String profileName : profileNames) {
+				// TODO: 创建profile对象，加到profiles中
 				profiles.add(new Profile(profileName));
 			}
 			return new LinkedHashSet<>(profiles);

@@ -50,6 +50,8 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
+ * TODO: 对于传统web而言，可能通过启动tomcat，来启动war包项目，此时这个类就发挥作用了
+ *
  * An opinionated {@link WebApplicationInitializer} to run a {@link SpringApplication}
  * from a traditional WAR deployment. Binds {@link Servlet}, {@link Filter} and
  * {@link ServletContextInitializer} beans from the application context to the server.
@@ -87,6 +89,12 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		this.registerErrorPageFilter = registerErrorPageFilter;
 	}
 
+	/**
+	 * TODO: 在tomcat 启动中，会被tomcat间接的回调,然后去启动spring进行加载IOC容器
+	 *
+	 * @param servletContext
+	 * @throws ServletException
+	 */
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		// Logger initialization is deferred in case an ordered
@@ -124,17 +132,27 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		}
 	}
 
+	/**
+	 * TODO: 会创建 applicationContext， 这里需要注意的是，这里是和spring boot相结合的，并非spring mvc环境下了
+	 * @param servletContext
+	 * @return
+	 */
 	protected WebApplicationContext createRootApplicationContext(ServletContext servletContext) {
+		// TODO: 这里注意了，创建的是SpringApplicationBuilder, 用来构建SpringApplication
 		SpringApplicationBuilder builder = createSpringApplicationBuilder();
 		builder.main(getClass());
+		// TODO: 判断是否已经存在 rootWebApplicationContext
 		ApplicationContext parent = getExistingRootWebApplicationContext(servletContext);
 		if (parent != null) {
 			this.logger.info("Root context already created (using as parent).");
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, null);
+			// TODO: 设置父容器
 			builder.initializers(new ParentContextApplicationContextInitializer(parent));
 		}
 		builder.initializers(new ServletContextApplicationContextInitializer(servletContext));
+		// TODO: 设置使用 AnnotationConfigServletWebServerApplicationContext 这个applicationContext
 		builder.contextClass(AnnotationConfigServletWebServerApplicationContext.class);
+		// TODO: 这里可以交由子类去重写，然后配置我们自己的source
 		builder = configure(builder);
 		builder.listeners(new WebEnvironmentPropertySourceInitializer(servletContext));
 		SpringApplication application = builder.build();
@@ -150,6 +168,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 			application.addPrimarySources(Collections.singleton(ErrorPageFilterConfiguration.class));
 		}
 		application.setRegisterShutdownHook(false);
+		// TODO: 最后调用run方法
 		return run(application);
 	}
 
@@ -170,6 +189,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 	 * @return the {@link WebApplicationContext}
 	 */
 	protected WebApplicationContext run(SpringApplication application) {
+		// TODO: 调用SpringApplication的run方法, 到这 其实我们的spring boot容器就启动了
 		return (WebApplicationContext) application.run();
 	}
 

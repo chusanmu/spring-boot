@@ -34,6 +34,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 此类的主要作用就是 加载环境中的属性 context.listener.classes，用户可以配置一系列的listener
+ *
  * {@link ApplicationListener} that delegates to other listeners that are specified under
  * a {@literal context.listener.classes} environment property.
  *
@@ -66,6 +68,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 				this.multicaster.addApplicationListener(listener);
 			}
 		}
+		// TODO: 然后将这个原始的event广播出去
 		if (this.multicaster != null) {
 			this.multicaster.multicastEvent(event);
 		}
@@ -80,8 +83,10 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 		String classNames = environment.getProperty(PROPERTY_NAME);
 		List<ApplicationListener<ApplicationEvent>> listeners = new ArrayList<>();
 		if (StringUtils.hasLength(classNames)) {
+			// TODO: 逗号分隔
 			for (String className : StringUtils.commaDelimitedListToSet(classNames)) {
 				try {
+					// TODO: 加载进来，然后进行实例化
 					Class<?> clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
 					Assert.isAssignable(ApplicationListener.class, clazz,
 							"class [" + className + "] must implement ApplicationListener");
@@ -93,6 +98,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 				}
 			}
 		}
+		// TODO: 对Listeners进行排序
 		AnnotationAwareOrderComparator.sort(listeners);
 		return listeners;
 	}

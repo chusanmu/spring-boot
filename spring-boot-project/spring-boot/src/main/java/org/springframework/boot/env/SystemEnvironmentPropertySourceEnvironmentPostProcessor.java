@@ -29,6 +29,7 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 
 /**
+ * TODO: 对 环境变量进行了替换 systemEnvironment
  * An {@link EnvironmentPostProcessor} that replaces the systemEnvironment
  * {@link SystemEnvironmentPropertySource} with an
  * {@link OriginAwareSystemEnvironmentPropertySource} that can track the

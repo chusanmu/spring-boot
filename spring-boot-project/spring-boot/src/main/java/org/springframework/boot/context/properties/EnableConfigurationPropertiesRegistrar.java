@@ -46,10 +46,17 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 				.filter((type) -> void.class != type).collect(Collectors.toSet());
 	}
 
+	/**
+	 * TODO: 开始注册基本的bean
+	 *
+	 * @param registry
+	 */
 	@SuppressWarnings("deprecation")
 	static void registerInfrastructureBeans(BeanDefinitionRegistry registry) {
+		// TODO: 注册 ConfigurationPropertiesBindingPostProcessor
 		ConfigurationPropertiesBindingPostProcessor.register(registry);
 		BoundConfigurationProperties.register(registry);
+		// TODO: 注册 ConfigurationBeanFactoryMetadata
 		ConfigurationBeanFactoryMetadata.register(registry);
 	}
 

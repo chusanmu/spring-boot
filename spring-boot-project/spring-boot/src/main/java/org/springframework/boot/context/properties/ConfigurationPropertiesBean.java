@@ -197,7 +197,9 @@ public final class ConfigurationPropertiesBean {
 	 * {@link ConfigurationProperties @ConfigurationProperties}
 	 */
 	public static ConfigurationPropertiesBean get(ApplicationContext applicationContext, Object bean, String beanName) {
+		// TODO: 查找factoryMethod
 		Method factoryMethod = findFactoryMethod(applicationContext, beanName);
+		// TODO: 根据factoryMethod去生成 ConfigurationPropertiesBean
 		return create(beanName, bean, bean.getClass(), factoryMethod);
 	}
 
@@ -213,36 +215,53 @@ public final class ConfigurationPropertiesBean {
 	}
 
 	private static Method findFactoryMethod(ConfigurableListableBeanFactory beanFactory, String beanName) {
+		// TODO: 如果当前beanFactory包含这个bean的beanDefinition
 		if (beanFactory.containsBeanDefinition(beanName)) {
+			// TODO: 拿到它的beanDefinition
 			BeanDefinition beanDefinition = beanFactory.getMergedBeanDefinition(beanName);
 			if (beanDefinition instanceof RootBeanDefinition) {
+				// TODO: 拿到解析好的factoryMethod
 				Method resolvedFactoryMethod = ((RootBeanDefinition) beanDefinition).getResolvedFactoryMethod();
 				if (resolvedFactoryMethod != null) {
 					return resolvedFactoryMethod;
 				}
 			}
+			// TODO: 通过反射获取factoryMethod
 			return findFactoryMethodUsingReflection(beanFactory, beanDefinition);
 		}
 		return null;
 	}
 
+	/**
+	 * TODO: 通过反射获取factoryMethod
+	 *
+	 * @param beanFactory
+	 * @param beanDefinition
+	 * @return
+	 */
 	private static Method findFactoryMethodUsingReflection(ConfigurableListableBeanFactory beanFactory,
 			BeanDefinition beanDefinition) {
+		// TODO: 把这俩值拿出来
 		String factoryMethodName = beanDefinition.getFactoryMethodName();
 		String factoryBeanName = beanDefinition.getFactoryBeanName();
+		// TODO: 如果这俩值 都为空，那就直接返回空
 		if (factoryMethodName == null || factoryBeanName == null) {
 			return null;
 		}
+		// TODO: 根据bean的名称，把bean的类型拿到
 		Class<?> factoryType = beanFactory.getType(factoryBeanName);
+		// TODO: 如果bean的类型中包含 cglib生成的代理的符号，那就把它的父类拿到
 		if (factoryType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
 			factoryType = factoryType.getSuperclass();
 		}
+		// TODO: 设置factoryMethod
 		AtomicReference<Method> factoryMethod = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(factoryType, (method) -> {
 			if (method.getName().equals(factoryMethodName)) {
 				factoryMethod.set(method);
 			}
 		});
+		// TODO: 把factoryMethod返回
 		return factoryMethod.get();
 	}
 
@@ -253,14 +272,26 @@ public final class ConfigurationPropertiesBean {
 		return propertiesBean;
 	}
 
+	/**
+	 * TODO: 根据factoryMethod来生成 ConfigurationPropertiesBean
+	 * @param name
+	 * @param instance
+	 * @param type
+	 * @param factory
+	 * @return
+	 */
 	private static ConfigurationPropertiesBean create(String name, Object instance, Class<?> type, Method factory) {
+		// TODO: 第一步查找 ConfigurationProperties注解
 		ConfigurationProperties annotation = findAnnotation(instance, type, factory, ConfigurationProperties.class);
 		if (annotation == null) {
 			return null;
 		}
+		// TODO: 去查找Validated注解，因为属性可以被校验的
 		Validated validated = findAnnotation(instance, type, factory, Validated.class);
+		// TODO: 把它们放进一个数组里面
 		Annotation[] annotations = (validated != null) ? new Annotation[] { annotation, validated }
 				: new Annotation[] { annotation };
+
 		ResolvableType bindType = (factory != null) ? ResolvableType.forMethodReturnType(factory)
 				: ResolvableType.forClass(type);
 		Bindable<Object> bindTarget = Bindable.of(bindType).withAnnotations(annotations);

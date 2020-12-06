@@ -31,6 +31,8 @@ import org.springframework.core.env.PropertySources;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 和ConfigurationProperties有关，用于绑定属性
+ *
  * {@link BeanPostProcessor} to bind {@link PropertySources} to beans annotated with
  * {@link ConfigurationProperties @ConfigurationProperties}.
  *
@@ -65,6 +67,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 		// We can't use constructor injection of the application context because
 		// it causes eager factory bean initialization
 		this.registry = (BeanDefinitionRegistry) this.applicationContext.getAutowireCapableBeanFactory();
+		// TODO: 拿到配置属性绑定器
 		this.binder = ConfigurationPropertiesBinder.get(this.applicationContext);
 	}
 
@@ -86,6 +89,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 		Assert.state(bean.getBindMethod() == BindMethod.JAVA_BEAN, "Cannot bind @ConfigurationProperties for bean '"
 				+ bean.getName() + "'. Ensure that @ConstructorBinding has not been applied to regular bean");
 		try {
+			// TODO: 使用binder进行绑定
 			this.binder.bind(bean);
 		}
 		catch (Exception ex) {
@@ -106,12 +110,15 @@ public class ConfigurationPropertiesBindingPostProcessor
 	 */
 	public static void register(BeanDefinitionRegistry registry) {
 		Assert.notNull(registry, "Registry must not be null");
+		// TODO: 如果当前容器中不存在这个bean
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
+			// TODO: 然后创建beanDefinition，注册到容器中
 			GenericBeanDefinition definition = new GenericBeanDefinition();
 			definition.setBeanClass(ConfigurationPropertiesBindingPostProcessor.class);
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(BEAN_NAME, definition);
 		}
+		// TODO: 注册binder
 		ConfigurationPropertiesBinder.register(registry);
 	}
 
