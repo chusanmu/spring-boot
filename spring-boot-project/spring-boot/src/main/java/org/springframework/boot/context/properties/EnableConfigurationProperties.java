@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Import;
 public @interface EnableConfigurationProperties {
 
 	/**
+	 * TODO: ConfigurationProperties校验器名称，如果配置了这个校验器，bean的名称为它，会参与校验properties
 	 * The bean name of the configuration properties validator.
 	 * @since 2.2.0
 	 */

@@ -154,10 +154,13 @@ public final class ConfigurationPropertiesBean {
 		Iterator<String> beanNames = beanFactory.getBeanNamesIterator();
 		while (beanNames.hasNext()) {
 			String beanName = beanNames.next();
+			// TODO: 如果这个bean上面有 @ConfigurationProperties注解
 			if (isConfigurationPropertiesBean(beanFactory, beanName)) {
 				try {
+					// TODO: 初始化 ，把bean拿到，然后封装到ConfigurationPropertiesBean中
 					Object bean = beanFactory.getBean(beanName);
 					ConfigurationPropertiesBean propertiesBean = get(applicationContext, bean, beanName);
+					// TODO: 加到propertiesBeans中
 					propertiesBeans.put(beanName, propertiesBean);
 				}
 				catch (Exception ex) {
@@ -292,8 +295,10 @@ public final class ConfigurationPropertiesBean {
 		Annotation[] annotations = (validated != null) ? new Annotation[] { annotation, validated }
 				: new Annotation[] { annotation };
 
+		// TODO: 构建 Bindable
 		ResolvableType bindType = (factory != null) ? ResolvableType.forMethodReturnType(factory)
 				: ResolvableType.forClass(type);
+		// TODO: 把注解拿出来，后期会根据注解来生成不同的处理策略
 		Bindable<Object> bindTarget = Bindable.of(bindType).withAnnotations(annotations);
 		if (instance != null) {
 			bindTarget = bindTarget.withExistingValue(instance);

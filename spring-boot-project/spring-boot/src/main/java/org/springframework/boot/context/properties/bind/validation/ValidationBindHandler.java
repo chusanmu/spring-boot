@@ -98,6 +98,7 @@ public class ValidationBindHandler extends AbstractBindHandler {
 	@Override
 	public void onFinish(ConfigurationPropertyName name, Bindable<?> target, BindContext context, Object result)
 			throws Exception {
+		// TODO: 在绑定完成之后，会进行校验值是否符合
 		validate(name, target, context, result);
 		super.onFinish(name, target, context, result);
 	}

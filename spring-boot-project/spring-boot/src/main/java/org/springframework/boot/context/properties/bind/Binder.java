@@ -366,6 +366,7 @@ public class Binder {
 
 	private <T> Object bindObject(ConfigurationPropertyName name, Bindable<T> target, BindHandler handler,
 			Context context, boolean allowRecursiveBinding) {
+		// TODO: 查找属性 会从environment的propetySource中加载对应的属性，返回回来
 		ConfigurationProperty property = findProperty(name, context);
 		if (property == null && context.depth != 0 && containsNoDescendantOf(context.getSources(), name)) {
 			return null;
@@ -418,7 +419,9 @@ public class Binder {
 		if (name.isEmpty()) {
 			return null;
 		}
+		// TODO: 获取所有的propertySource
 		for (ConfigurationPropertySource source : context.getSources()) {
+			// TODO: 尝试从propertySource中获取值
 			ConfigurationProperty property = source.getConfigurationProperty(name);
 			if (property != null) {
 				return property;
@@ -444,6 +447,7 @@ public class Binder {
 		if (!allowRecursiveBinding && context.isBindingDataObject(type)) {
 			return null;
 		}
+		// TODO: 属性字段绑定器
 		DataObjectPropertyBinder propertyBinder = (propertyName, propertyTarget) -> bind(name.append(propertyName),
 				propertyTarget, handler, context, false, false);
 		return context.withDataObject(type, () -> {

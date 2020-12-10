@@ -83,6 +83,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 	}
 
 	private void bind(ConfigurationPropertiesBean bean) {
+		// TODO: 如果为空，表示这个bean它不是一个 @ConfigurationProperties
 		if (bean == null || hasBoundValueObject(bean.getName())) {
 			return;
 		}

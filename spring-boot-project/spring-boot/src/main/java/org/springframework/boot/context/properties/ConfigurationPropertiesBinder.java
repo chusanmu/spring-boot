@@ -79,14 +79,19 @@ class ConfigurationPropertiesBinder {
 	ConfigurationPropertiesBinder(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 		this.propertySources = new PropertySourcesDeducer(applicationContext).getPropertySources();
+		// TODO: 尝试从容器中获取名字为configurationPropertiesValidator的bean
 		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(applicationContext);
 		this.jsr303Present = ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContext);
 	}
 
 	BindResult<?> bind(ConfigurationPropertiesBean propertiesBean) {
+		// TODO: 把bindable拿出来
 		Bindable<?> target = propertiesBean.asBindTarget();
+		// TODO: 把注解也拿出来
 		ConfigurationProperties annotation = propertiesBean.getAnnotation();
+		// TODO: 获取bind处理器
 		BindHandler bindHandler = getBindHandler(target, annotation);
+		// TODO: 获取绑定器 进行绑定
 		return getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
 
@@ -98,15 +103,19 @@ class ConfigurationPropertiesBinder {
 	}
 
 	private Validator getConfigurationPropertiesValidator(ApplicationContext applicationContext) {
+		// TODO: 如果容器中有名称为 configurationPropertiesValidator 的这个bean
 		if (applicationContext.containsBean(VALIDATOR_BEAN_NAME)) {
+			// TODO: 就把它拿出来
 			return applicationContext.getBean(VALIDATOR_BEAN_NAME, Validator.class);
 		}
 		return null;
 	}
 
 	private <T> BindHandler getBindHandler(Bindable<T> target, ConfigurationProperties annotation) {
+		// TODO: 获取校验器
 		List<Validator> validators = getValidators(target);
 		BindHandler handler = getHandler();
+		// TODO: 忽略无效的字段
 		if (annotation.ignoreInvalidFields()) {
 			handler = new IgnoreErrorsBindHandler(handler);
 		}
@@ -114,7 +123,9 @@ class ConfigurationPropertiesBinder {
 			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
+		// TODO: 校验器不为空
 		if (!validators.isEmpty()) {
+			// TODO: 会去校验字段值是否符合Validator的定义
 			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));
 		}
 		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {
@@ -130,14 +141,22 @@ class ConfigurationPropertiesBinder {
 				: new IgnoreTopLevelConverterNotFoundBindHandler();
 	}
 
+	/**
+	 * 获取validator校验器
+	 * @param target
+	 * @return
+	 */
 	private List<Validator> getValidators(Bindable<?> target) {
 		List<Validator> validators = new ArrayList<>(3);
+		// TODO:  配置了校验器，那就加进来
 		if (this.configurationPropertiesValidator != null) {
 			validators.add(this.configurationPropertiesValidator);
 		}
+		// TODO: jsr规范定义的，那也加进来
 		if (this.jsr303Present && target.getAnnotation(Validated.class) != null) {
 			validators.add(getJsr303Validator());
 		}
+		// TODO: target的value是validator类型的，那也加进来
 		if (target.getValue() != null && target.getValue().get() instanceof Validator) {
 			validators.add((Validator) target.getValue().get());
 		}

@@ -35,6 +35,7 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 
 /**
+ * TODO：javaBean属性绑定
  * {@link DataObjectBinder} for mutable Java Beans.
  *
  * @author Phillip Webb
@@ -76,7 +77,9 @@ class JavaBeanBinder implements DataObjectBinder {
 	private <T> boolean bind(DataObjectPropertyBinder propertyBinder, Bean<T> bean, BeanSupplier<T> beanSupplier,
 			Context context) {
 		boolean bound = false;
+		// TODO: 把这个bean相关的字段的封装拿到
 		for (BeanProperty beanProperty : bean.getProperties().values()) {
+			// TODO: 一个个的进行绑定
 			bound |= bind(beanSupplier, propertyBinder, beanProperty);
 			context.clearConfigurationProperty();
 		}
@@ -88,12 +91,15 @@ class JavaBeanBinder implements DataObjectBinder {
 		String propertyName = property.getName();
 		ResolvableType type = property.getType();
 		Supplier<Object> value = property.getValue(beanSupplier);
+		// TODO: 获取属性上面的所有的注解
 		Annotation[] annotations = property.getAnnotations();
+		// TODO: 进行绑定属性值
 		Object bound = propertyBinder.bindProperty(propertyName,
 				Bindable.of(type).withSuppliedValue(value).withAnnotations(annotations));
 		if (bound == null) {
 			return false;
 		}
+		// TODO: 把你的值设置到property字段中
 		if (property.isSettable()) {
 			property.setValue(beanSupplier, bound);
 		}
@@ -264,14 +270,29 @@ class JavaBeanBinder implements DataObjectBinder {
 	 */
 	static class BeanProperty {
 
+		/**
+		 * TODO: 属性名
+		 */
 		private final String name;
 
+		/**
+		 * TODO:  属性所属的class的类型
+		 */
 		private final ResolvableType declaringClassType;
 
+		/**
+		 * Get方法
+		 */
 		private Method getter;
 
+		/**
+		 * Set方法
+		 */
 		private Method setter;
 
+		/**
+		 * 对应的字段
+		 */
 		private Field field;
 
 		BeanProperty(String name, ResolvableType declaringClassType) {
@@ -338,6 +359,10 @@ class JavaBeanBinder implements DataObjectBinder {
 			};
 		}
 
+		/**
+		 * TODO:  如果可设置，setter方法不为空，表示可以被set
+		 * @return
+		 */
 		boolean isSettable() {
 			return this.setter != null;
 		}
