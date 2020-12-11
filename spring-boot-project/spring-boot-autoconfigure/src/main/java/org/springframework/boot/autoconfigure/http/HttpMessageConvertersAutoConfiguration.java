@@ -67,6 +67,7 @@ public class HttpMessageConvertersAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public HttpMessageConverters messageConverters(ObjectProvider<HttpMessageConverter<?>> converters) {
+		// TODO: 将所有的httpMessageConverter 收到了 httpMessageConverters中
 		return new HttpMessageConverters(converters.orderedStream().collect(Collectors.toList()));
 	}
 

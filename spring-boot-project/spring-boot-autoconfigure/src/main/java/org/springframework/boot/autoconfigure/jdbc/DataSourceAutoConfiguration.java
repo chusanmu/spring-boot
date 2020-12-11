@@ -42,6 +42,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: datasource自动装配文件
+ *
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DataSource}.
  *
  * @author Dave Syer

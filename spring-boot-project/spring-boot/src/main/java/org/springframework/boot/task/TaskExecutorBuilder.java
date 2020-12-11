@@ -63,6 +63,9 @@ public class TaskExecutorBuilder {
 
 	private final TaskDecorator taskDecorator;
 
+	/**
+	 * TODO: Task Executor 定制器
+	 */
 	private final Set<TaskExecutorCustomizer> customizers;
 
 	public TaskExecutorBuilder() {

@@ -89,6 +89,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 	 * used for further converter manipulation.
 	 */
 	public HttpMessageConverters(Collection<HttpMessageConverter<?>> additionalConverters) {
+		// TODO: 添加默认的转换器
 		this(true, additionalConverters);
 	}
 
@@ -101,7 +102,9 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 	 * converter manipulation.
 	 */
 	public HttpMessageConverters(boolean addDefaultConverters, Collection<HttpMessageConverter<?>> converters) {
+		// TODO: 合并消息转换器
 		List<HttpMessageConverter<?>> combined = getCombinedConverters(converters,
+				// TODO: 获取默认的消息转换器
 				addDefaultConverters ? getDefaultConverters() : Collections.emptyList());
 		combined = postProcessConverters(combined);
 		this.converters = Collections.unmodifiableList(combined);
@@ -115,6 +118,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 			Iterator<HttpMessageConverter<?>> iterator = processing.iterator();
 			while (iterator.hasNext()) {
 				HttpMessageConverter<?> candidate = iterator.next();
+				// TODO: 判断是否可被替换，如果可以被替换 往combined中添加
 				if (isReplacement(defaultConverter, candidate)) {
 					combined.add(candidate);
 					iterator.remove();
@@ -125,6 +129,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 				configurePartConverters((AllEncompassingFormHttpMessageConverter) defaultConverter, converters);
 			}
 		}
+		// TODO: 默认的转换器会在后面
 		combined.addAll(0, processing);
 		return combined;
 	}
@@ -175,8 +180,14 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 		return converters;
 	}
 
+	/**
+	 * TODO: 获取默认的消息转换器
+	 *
+	 * @return
+	 */
 	private List<HttpMessageConverter<?>> getDefaultConverters() {
 		List<HttpMessageConverter<?>> converters = new ArrayList<>();
+		// TODO: 如果classpath中存在 WebMvcConfigurationSupport 直接new一个，获取defaultMessageConverters
 		if (ClassUtils.isPresent("org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport",
 				null)) {
 			converters.addAll(new WebMvcConfigurationSupport() {
@@ -188,12 +199,17 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 			}.defaultMessageConverters());
 		}
 		else {
+			// TODO: 从restTemplate中拿
 			converters.addAll(new RestTemplate().getMessageConverters());
 		}
 		reorderXmlConvertersToEnd(converters);
 		return converters;
 	}
 
+	/**
+	 * TODO: 添加xml 转换器
+	 * @param converters
+	 */
 	private void reorderXmlConvertersToEnd(List<HttpMessageConverter<?>> converters) {
 		List<HttpMessageConverter<?>> xml = new ArrayList<>();
 		for (Iterator<HttpMessageConverter<?>> iterator = converters.iterator(); iterator.hasNext();) {
