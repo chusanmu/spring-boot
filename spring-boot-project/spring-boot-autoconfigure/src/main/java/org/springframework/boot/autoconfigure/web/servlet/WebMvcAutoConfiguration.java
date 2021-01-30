@@ -354,7 +354,7 @@ public class WebMvcAutoConfiguration {
 		}
 
 		/**
-		 * TODO: 注册了一个RequestContextFilter过滤器
+		 * TODO: 注册了一个RequestContextFilter过滤器, 这个过滤器 其实蛮重要的，设置了Locala信息，和国际化配置有关
 		 * @return
 		 */
 		@Bean

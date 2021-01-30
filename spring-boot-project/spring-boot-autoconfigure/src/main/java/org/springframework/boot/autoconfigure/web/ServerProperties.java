@@ -882,6 +882,7 @@ public class ServerProperties {
 		public static class Threads {
 
 			/**
+			 * TODO: worker线程数 最大是200个
 			 * Maximum amount of worker threads.
 			 */
 			private int max = 200;

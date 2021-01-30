@@ -104,23 +104,35 @@ public class SecurityProperties {
 
 	}
 
+	/**
+	 * TODO: spring security中的user, 默认的username为user, 默认生成一个随机密码串
+	 */
 	public static class User {
 
 		/**
+		 * TODO: 默认的user name
+		 *
 		 * Default user name.
 		 */
 		private String name = "user";
 
 		/**
+		 * TODO: 使用UUID生成随机密码
+		 *
 		 * Password for the default user name.
 		 */
 		private String password = UUID.randomUUID().toString();
 
 		/**
+		 * TODO: 用户的角色
+		 *
 		 * Granted roles for the default user name.
 		 */
 		private List<String> roles = new ArrayList<>();
 
+		/**
+		 * 默认生成随机密码
+		 */
 		private boolean passwordGenerated = true;
 
 		public String getName() {
@@ -135,6 +147,10 @@ public class SecurityProperties {
 			return this.password;
 		}
 
+		/**
+		 * 设置密码，同时passwordGenerated置位false
+		 * @param password
+		 */
 		public void setPassword(String password) {
 			if (!StringUtils.hasLength(password)) {
 				return;

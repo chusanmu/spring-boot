@@ -17,6 +17,7 @@
 package org.springframework.boot.web.server;
 
 /**
+ * TODO: web接口，有start, stop, getPort方法, 例如 tomcat , netty ,jetty等server都会实现此接口
  * Simple interface that represents a fully configured web server (for example Tomcat,
  * Jetty, Netty). Allows the server to be {@link #start() started} and {@link #stop()
  * stopped}.
@@ -28,6 +29,7 @@ package org.springframework.boot.web.server;
 public interface WebServer {
 
 	/**
+	 * 开启web服务器
 	 * Starts the web server. Calling this method on an already started server has no
 	 * effect.
 	 * @throws WebServerException if the server cannot be started

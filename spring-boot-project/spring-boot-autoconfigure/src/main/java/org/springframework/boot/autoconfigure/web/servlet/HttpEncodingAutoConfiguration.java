@@ -56,6 +56,7 @@ public class HttpEncodingAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public CharacterEncodingFilter characterEncodingFilter() {
+		// TODO: 设置编码过滤器，默认utf-8
 		CharacterEncodingFilter filter = new OrderedCharacterEncodingFilter();
 		filter.setEncoding(this.properties.getCharset().name());
 		filter.setForceRequestEncoding(this.properties.shouldForce(Encoding.Type.REQUEST));

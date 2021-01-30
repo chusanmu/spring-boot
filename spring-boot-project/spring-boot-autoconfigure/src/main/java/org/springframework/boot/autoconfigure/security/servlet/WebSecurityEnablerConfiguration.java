@@ -25,6 +25,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
+ * TODO: 开启webSecurity
  * If there is a bean of type WebSecurityConfigurerAdapter, this adds the
  * {@link EnableWebSecurity @EnableWebSecurity} annotation. This will make sure that the
  * annotation is present with default security auto-configuration and also if the user

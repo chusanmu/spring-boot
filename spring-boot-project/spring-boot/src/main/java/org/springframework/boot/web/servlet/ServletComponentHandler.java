@@ -68,10 +68,17 @@ abstract class ServletComponentHandler {
 		return initParameters;
 	}
 
+	/**
+	 * TODO: 去处理beanDefinition
+	 * @param beanDefinition
+	 * @param registry
+	 */
 	void handle(AnnotatedBeanDefinition beanDefinition, BeanDefinitionRegistry registry) {
+		// TODO: 去拿当前的注解，如果拿到了，开始去处理
 		Map<String, Object> attributes = beanDefinition.getMetadata()
 				.getAnnotationAttributes(this.annotationType.getName());
 		if (attributes != null) {
+			// TODO: 处理注解
 			doHandle(attributes, beanDefinition, registry);
 		}
 	}

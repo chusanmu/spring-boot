@@ -56,6 +56,11 @@ public class SecurityFilterAutoConfiguration {
 
 	private static final String DEFAULT_FILTER_NAME = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME;
 
+	/**
+	 * TODO: 用于创建FilterProxy, 名字为 springSecurityFilterChain
+	 * @param securityProperties
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnBean(name = DEFAULT_FILTER_NAME)
 	public DelegatingFilterProxyRegistrationBean securityFilterChainRegistration(

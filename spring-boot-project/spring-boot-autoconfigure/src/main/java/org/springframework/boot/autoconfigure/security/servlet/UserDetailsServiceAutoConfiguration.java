@@ -67,6 +67,12 @@ public class UserDetailsServiceAutoConfiguration {
 
 	private static final Log logger = LogFactory.getLog(UserDetailsServiceAutoConfiguration.class);
 
+	/**
+	 * 内存用户管理器，默认给你生成了一个user, 如果没做任何处理的话，是有一个默认的user的
+	 * @param properties
+	 * @param passwordEncoder
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(
 			type = "org.springframework.security.oauth2.client.registration.ClientRegistrationRepository")
@@ -75,6 +81,7 @@ public class UserDetailsServiceAutoConfiguration {
 			ObjectProvider<PasswordEncoder> passwordEncoder) {
 		SecurityProperties.User user = properties.getUser();
 		List<String> roles = user.getRoles();
+		// TODO: 直接创建了个内存用户管理器
 		return new InMemoryUserDetailsManager(
 				User.withUsername(user.getName()).password(getOrDeducePassword(user, passwordEncoder.getIfAvailable()))
 						.roles(StringUtils.toStringArray(roles)).build());
@@ -82,12 +89,14 @@ public class UserDetailsServiceAutoConfiguration {
 
 	private String getOrDeducePassword(SecurityProperties.User user, PasswordEncoder encoder) {
 		String password = user.getPassword();
+		// TODO: 如果用户的密码是随机生成的，则打印至控制台上
 		if (user.isPasswordGenerated()) {
 			logger.info(String.format("%n%nUsing generated security password: %s%n", user.getPassword()));
 		}
 		if (encoder != null || PASSWORD_ALGORITHM_PATTERN.matcher(password).matches()) {
 			return password;
 		}
+		// TODO: 返回密码
 		return NOOP_PASSWORD_PREFIX + password;
 	}
 

@@ -41,6 +41,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @ConditionalOnWebApplication(type = Type.SERVLET)
 public class SpringBootWebSecurityConfiguration {
 
+	/**
+	 * 导入spring security的 WebSecurityConfigurerAdapter 主要作为一个配置
+	 */
 	@Configuration(proxyBeanMethods = false)
 	@Order(SecurityProperties.BASIC_AUTH_ORDER)
 	static class DefaultConfigurerAdapter extends WebSecurityConfigurerAdapter {

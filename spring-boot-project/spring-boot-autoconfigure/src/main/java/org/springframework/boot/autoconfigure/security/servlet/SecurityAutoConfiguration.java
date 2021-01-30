@@ -44,6 +44,11 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
 		SecurityDataConfiguration.class })
 public class SecurityAutoConfiguration {
 
+	/**
+	 * TODO: 添加一个默认的事件发布器
+	 * @param publisher
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(AuthenticationEventPublisher.class)
 	public DefaultAuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher publisher) {

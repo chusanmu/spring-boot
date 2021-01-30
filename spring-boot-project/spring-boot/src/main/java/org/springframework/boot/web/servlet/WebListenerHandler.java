@@ -25,6 +25,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
+ * TODO: 处理webListener注解，直接注入了个 ServletListenerRegistrationBean 的bean
  * Handler for {@link WebListener @WebListener}-annotated classes.
  *
  * @author Andy Wilkinson

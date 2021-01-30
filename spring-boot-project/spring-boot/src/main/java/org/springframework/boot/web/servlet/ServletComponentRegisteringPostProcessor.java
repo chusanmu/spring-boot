@@ -33,6 +33,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.web.context.WebApplicationContext;
 
 /**
+ * TODO: spring boot支持  servlet3.0注解 webServlet, webFilter, webListener
  * {@link BeanFactoryPostProcessor} that registers beans for Servlet components found via
  * package scanning.
  *
@@ -45,6 +46,7 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 	private static final List<ServletComponentHandler> HANDLERS;
 
 	static {
+		// TODO: 定义了三个处理器放了进去
 		List<ServletComponentHandler> servletComponentHandlers = new ArrayList<>();
 		servletComponentHandlers.add(new WebServletHandler());
 		servletComponentHandlers.add(new WebFilterHandler());
@@ -62,9 +64,12 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		// TODO: 判断是否是在嵌入式web服务器中运行的
 		if (isRunningInEmbeddedWebServer()) {
+			// TODO: 创建拿到一个组件扫描器
 			ClassPathScanningCandidateComponentProvider componentProvider = createComponentProvider();
 			for (String packageToScan : this.packagesToScan) {
+				// TODO: 挨个扫描 每一个包路径
 				scanPackage(componentProvider, packageToScan);
 			}
 		}
@@ -72,6 +77,7 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 
 	private void scanPackage(ClassPathScanningCandidateComponentProvider componentProvider, String packageToScan) {
 		for (BeanDefinition candidate : componentProvider.findCandidateComponents(packageToScan)) {
+			// TODO: 扫描拿到beanDefinition，然后用三个handlers去过一下，去处理
 			if (candidate instanceof AnnotatedBeanDefinition) {
 				for (ServletComponentHandler handler : HANDLERS) {
 					handler.handle(((AnnotatedBeanDefinition) candidate),
@@ -81,17 +87,24 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 		}
 	}
 
+	/**
+	 * TODO: 判断是否在嵌入式webServer中运行
+	 *
+	 * @return
+	 */
 	private boolean isRunningInEmbeddedWebServer() {
 		return this.applicationContext instanceof WebApplicationContext
 				&& ((WebApplicationContext) this.applicationContext).getServletContext() == null;
 	}
 
 	private ClassPathScanningCandidateComponentProvider createComponentProvider() {
+		// TODO: 创建一个@Component，专门用于扫描classPath中的 组件
 		ClassPathScanningCandidateComponentProvider componentProvider = new ClassPathScanningCandidateComponentProvider(
 				false);
 		componentProvider.setEnvironment(this.applicationContext.getEnvironment());
 		componentProvider.setResourceLoader(this.applicationContext);
 		for (ServletComponentHandler handler : HANDLERS) {
+			// TODO: 将每个handler的typeFilter塞给扫描器
 			componentProvider.addIncludeFilter(handler.getTypeFilter());
 		}
 		return componentProvider;

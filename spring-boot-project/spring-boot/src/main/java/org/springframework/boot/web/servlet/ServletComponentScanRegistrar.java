@@ -42,41 +42,61 @@ class ServletComponentScanRegistrar implements ImportBeanDefinitionRegistrar {
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+		// TODO: 获取扫描包路径
 		Set<String> packagesToScan = getPackagesToScan(importingClassMetadata);
+		// TODO: 如果容器中已经有 servletComponentRegisteringPostProcessor 这个postProcessor了
 		if (registry.containsBeanDefinition(BEAN_NAME)) {
+			// TODO: 更新当前扫描路径
 			updatePostProcessor(registry, packagesToScan);
 		}
 		else {
+			// TODO: 添加postProcessor
 			addPostProcessor(registry, packagesToScan);
 		}
 	}
 
 	private void updatePostProcessor(BeanDefinitionRegistry registry, Set<String> packagesToScan) {
+		// TODO: 拿到当前存在的beanDefinition
 		BeanDefinition definition = registry.getBeanDefinition(BEAN_NAME);
+		// TODO: 拿到beanDefinition，对应bean的Set入参类型的构造器
 		ValueHolder constructorArguments = definition.getConstructorArgumentValues().getGenericArgumentValue(Set.class);
 		@SuppressWarnings("unchecked")
 		Set<String> mergedPackages = (Set<String>) constructorArguments.getValue();
+		// TODO: 进行合并扫描路径
 		mergedPackages.addAll(packagesToScan);
+		// TODO: 进行设置值
 		constructorArguments.setValue(mergedPackages);
 	}
 
+	/**
+	 * TODO: 添加postProcessor
+	 * @param registry
+	 * @param packagesToScan
+	 */
 	private void addPostProcessor(BeanDefinitionRegistry registry, Set<String> packagesToScan) {
 		GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+		// TODO: 指定要添加的bean class
 		beanDefinition.setBeanClass(ServletComponentRegisteringPostProcessor.class);
+		// TODO: 将路径设置进去
 		beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(packagesToScan);
 		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		// TODO: 注册beanDefinition
 		registry.registerBeanDefinition(BEAN_NAME, beanDefinition);
 	}
 
 	private Set<String> getPackagesToScan(AnnotationMetadata metadata) {
 		AnnotationAttributes attributes = AnnotationAttributes
 				.fromMap(metadata.getAnnotationAttributes(ServletComponentScan.class.getName()));
+		// TODO: 获取扫描的路径
 		String[] basePackages = attributes.getStringArray("basePackages");
+		// TODO: 获取扫描的类
 		Class<?>[] basePackageClasses = attributes.getClassArray("basePackageClasses");
 		Set<String> packagesToScan = new LinkedHashSet<>(Arrays.asList(basePackages));
 		for (Class<?> basePackageClass : basePackageClasses) {
+			// TODO: 统一加到 packagesToScan
 			packagesToScan.add(ClassUtils.getPackageName(basePackageClass));
 		}
+		// TODO: 如果你没设置，就拿到当前metadata的包路径
 		if (packagesToScan.isEmpty()) {
 			packagesToScan.add(ClassUtils.getPackageName(metadata.getClassName()));
 		}

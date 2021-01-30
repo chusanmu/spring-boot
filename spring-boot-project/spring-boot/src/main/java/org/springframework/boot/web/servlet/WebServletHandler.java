@@ -29,6 +29,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 专门用于处理webServlet
+ *
  * Handler for {@link WebServlet @WebServlet}-annotated classes.
  *
  * @author Andy Wilkinson
@@ -39,9 +41,17 @@ class WebServletHandler extends ServletComponentHandler {
 		super(WebServlet.class);
 	}
 
+
+	/**
+	 * TODO: 肯定就是注册beanDefinition, ServletRegistrationBean
+	 * @param attributes
+	 * @param beanDefinition
+	 * @param registry
+	 */
 	@Override
 	public void doHandle(Map<String, Object> attributes, AnnotatedBeanDefinition beanDefinition,
 			BeanDefinitionRegistry registry) {
+		// TODO: 从注解里面拿出来值，设置到beanDefinition中
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ServletRegistrationBean.class);
 		builder.addPropertyValue("asyncSupported", attributes.get("asyncSupported"));
 		builder.addPropertyValue("initParameters", extractInitParameters(attributes));

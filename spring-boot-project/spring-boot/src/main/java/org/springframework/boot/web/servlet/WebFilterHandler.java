@@ -30,6 +30,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 处理webFilter
+ *
  * Handler for {@link WebFilter @WebFilter}-annotated classes.
  *
  * @author Andy Wilkinson
@@ -43,6 +45,7 @@ class WebFilterHandler extends ServletComponentHandler {
 	@Override
 	public void doHandle(Map<String, Object> attributes, AnnotatedBeanDefinition beanDefinition,
 			BeanDefinitionRegistry registry) {
+		// TODO: 去注册filter了
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(FilterRegistrationBean.class);
 		builder.addPropertyValue("asyncSupported", attributes.get("asyncSupported"));
 		builder.addPropertyValue("dispatcherTypes", extractDispatcherTypes(attributes));

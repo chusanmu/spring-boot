@@ -46,6 +46,7 @@ import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: tomcat web server 实现了 webServer的接口，里面封装了 tomcat
  * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
  * should be created using the {@link TomcatReactiveWebServerFactory} of
  * {@link TomcatServletWebServerFactory}, but not directly.
@@ -62,8 +63,14 @@ public class TomcatWebServer implements WebServer {
 
 	private final Object monitor = new Object();
 
+	/**
+	 * 临时保存每个service对应的connector
+	 */
 	private final Map<Service, Connector[]> serviceConnectors = new HashMap<>();
 
+	/**
+	 * TODO: 封装了一个tomcat
+	 */
 	private final Tomcat tomcat;
 
 	private final boolean autoStart;
@@ -101,31 +108,41 @@ public class TomcatWebServer implements WebServer {
 		this.tomcat = tomcat;
 		this.autoStart = autoStart;
 		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;
+		// TODO: 进行初始化，会进行启动tomcat
 		initialize();
 	}
 
 	private void initialize() throws WebServerException {
+		// TODO: 这个日志 我们可能会经常看到
 		logger.info("Tomcat initialized with port(s): " + getPortsDescription(false));
 		synchronized (this.monitor) {
 			try {
 				addInstanceIdToEngineName();
 
 				Context context = findContext();
+				// TODO: 添加一个生命周期监听器
 				context.addLifecycleListener((event) -> {
+					// TODO: 事件源是当前context触发的，并且事件类型是start
 					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
 						// Remove service connectors so that protocol binding doesn't
 						// happen when the service is started.
+						// TODO: 删除服务连接器，以便在启动服务时不会发生协议绑定。移除了service的connector，
+						//  所以下面tomcat在start的时候，不会绑定端口开启的.
 						removeServiceConnectors();
 					}
 				});
 
 				// Start the server to trigger initialization listeners
+				// TODO: 开启tomcat服务，会触发初始化监听器, 然后利用applicationContext容器，
+				//  拿出servlet, filter等添加到tomcat容器中，不会启动connector，因为上面移除了
 				this.tomcat.start();
 
 				// We can re-throw failure exception directly in the main thread
+				// TODO: 将异常重新抛出，抛出initializing过程的异常，抛出tomcat启动过程中的异常
 				rethrowDeferredStartupExceptions();
 
 				try {
+					// TODO: 绑定classLoader
 					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());
 				}
 				catch (NamingException ex) {
@@ -134,6 +151,7 @@ public class TomcatWebServer implements WebServer {
 
 				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
 				// blocking non-daemon to stop immediate shutdown
+				// TODO: 启动一个非守护线程 来等待停止tomcat
 				startDaemonAwaitThread();
 			}
 			catch (Exception ex) {
@@ -203,18 +221,28 @@ public class TomcatWebServer implements WebServer {
 		awaitThread.start();
 	}
 
+	/**
+	 * TODO: 开启tomcat
+	 *
+	 * @throws WebServerException
+	 */
 	@Override
 	public void start() throws WebServerException {
 		synchronized (this.monitor) {
+			// TODO: 如果已经开启完了 就直接返回了
 			if (this.started) {
 				return;
 			}
 			try {
+				// TODO: 将之前已经移除了的connector再次加到service中
 				addPreviouslyRemovedConnectors();
+				// TODO: 获取service对应的connector
 				Connector connector = this.tomcat.getConnector();
 				if (connector != null && this.autoStart) {
+					// TODO: 回去调用org.apache.catalina.core.StandardWrapper.load()方法，开始初始化servlet
 					performDeferredLoadOnStartup();
 				}
+				// TODO: 检查connector是否已经启动 成功，没有启动成功的话，直接抛出异常
 				checkThatConnectorsHaveStarted();
 				this.started = true;
 				logger.info("Tomcat started on port(s): " + getPortsDescription(true) + " with context path '"
@@ -273,17 +301,26 @@ public class TomcatWebServer implements WebServer {
 		this.tomcat.stop();
 	}
 
+
+	/**
+	 * TODO: 其目的是 将 serviceConnectors 中的connector加到service中
+	 */
 	private void addPreviouslyRemovedConnectors() {
+		// TODO: 获取tomcat server所有的services，然后挨个遍历
 		Service[] services = this.tomcat.getServer().findServices();
 		for (Service service : services) {
+			// TODO: 根据service拿到它的Connector
 			Connector[] connectors = this.serviceConnectors.get(service);
+			// TODO: 如果connectors不为空，然后进行遍历
 			if (connectors != null) {
 				for (Connector connector : connectors) {
+					// TODO: 将connector加到service中, 这时候会自动启动connector
 					service.addConnector(connector);
 					if (!this.autoStart) {
 						stopProtocolHandler(connector);
 					}
 				}
+				// TODO: 最后进行移除
 				this.serviceConnectors.remove(service);
 			}
 		}

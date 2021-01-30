@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreCompat;
 
 /**
+ * TODO: Spring boot内嵌Tomcat时使用的classLoader
  * Extension of Tomcat's {@link ParallelWebappClassLoader} that does not consider the
  * {@link ClassLoader#getSystemClassLoader() system classloader}. This is required to
  * ensure that any custom context class loader is always used (as is the case with some

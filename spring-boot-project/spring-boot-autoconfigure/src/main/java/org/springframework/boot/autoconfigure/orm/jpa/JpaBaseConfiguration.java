@@ -91,6 +91,11 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 		this.jtaTransactionManager = jtaTransactionManager.getIfAvailable();
 	}
 
+	/**
+	 * TODO: 创建jpa的事务管理器
+	 * @param transactionManagerCustomizers
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public PlatformTransactionManager transactionManager(
@@ -103,6 +108,7 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 	@Bean
 	@ConditionalOnMissingBean
 	public JpaVendorAdapter jpaVendorAdapter() {
+		// TODO: 适配jpa的实现厂商
 		AbstractJpaVendorAdapter adapter = createJpaVendorAdapter();
 		adapter.setShowSql(this.properties.isShowSql());
 		if (this.properties.getDatabase() != null) {
@@ -115,6 +121,14 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 		return adapter;
 	}
 
+	/**
+	 * TODO: 专门用来创建 LocalContainerEntityManagerFactoryBean
+	 *
+	 * @param jpaVendorAdapter
+	 * @param persistenceUnitManager
+	 * @param customizers
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public EntityManagerFactoryBuilder entityManagerFactoryBuilder(JpaVendorAdapter jpaVendorAdapter,
@@ -132,6 +146,7 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
 		Map<String, Object> vendorProperties = getVendorProperties();
 		customizeVendorProperties(vendorProperties);
+		// TODO: 创建 LocalContainerEntityManagerFactoryBean
 		return factoryBuilder.dataSource(this.dataSource).packages(getPackagesToScan()).properties(vendorProperties)
 				.mappingResources(getMappingResources()).jta(isJta()).build();
 	}
@@ -148,9 +163,14 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 	protected void customizeVendorProperties(Map<String, Object> vendorProperties) {
 	}
 
+	/**
+	 * 获得基本的包，去扫描包
+	 * @return
+	 */
 	protected String[] getPackagesToScan() {
 		List<String> packages = EntityScanPackages.get(this.beanFactory).getPackageNames();
 		if (packages.isEmpty() && AutoConfigurationPackages.has(this.beanFactory)) {
+			// TODO: 获取@EnableAutoConfiguration 自动导入使用的package路径
 			packages = AutoConfigurationPackages.get(this.beanFactory);
 		}
 		return StringUtils.toStringArray(packages);

@@ -80,6 +80,7 @@ public abstract class AutoConfigurationPackages {
 	}
 
 	/**
+	 * TODO: EnableAutoConfiguration， 注册包基础信息
 	 * Programmatically registers the auto-configuration package names. Subsequent
 	 * invocations will add the given package names to those that have already been
 	 * registered. You can use this method to manually define the base packages that will
@@ -91,12 +92,15 @@ public abstract class AutoConfigurationPackages {
 	 * @param packageNames the package names to set
 	 */
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+		// TODO: 如果当前已经有这个bean了，增加packageNames 包信息
 		if (registry.containsBeanDefinition(BEAN)) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(BEAN);
 			ConstructorArgumentValues constructorArguments = beanDefinition.getConstructorArgumentValues();
+			// TODO: 添加包信息
 			constructorArguments.addIndexedArgumentValue(0, addBasePackages(constructorArguments, packageNames));
 		}
 		else {
+			// TODO: 生成一个beanDefinition，指定其类型为BasePackages, 然后讲此bean注册到registry中
 			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
 			beanDefinition.setBeanClass(BasePackages.class);
 			beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, packageNames);
@@ -121,6 +125,7 @@ public abstract class AutoConfigurationPackages {
 
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+			// TODO: 注册包信息基础bean
 			register(registry, new PackageImports(metadata).getPackageNames().toArray(new String[0]));
 		}
 
@@ -132,6 +137,7 @@ public abstract class AutoConfigurationPackages {
 	}
 
 	/**
+	 * TODO: 封装了基础包信息
 	 * Wrapper for a package import.
 	 */
 	private static final class PackageImports {
@@ -142,12 +148,14 @@ public abstract class AutoConfigurationPackages {
 			AnnotationAttributes attributes = AnnotationAttributes
 					.fromMap(metadata.getAnnotationAttributes(AutoConfigurationPackage.class.getName(), false));
 			List<String> packageNames = new ArrayList<>();
+			// TODO: 从注解属性加载出basePackages, 如果这些有配置，就加到packageName
 			for (String basePackage : attributes.getStringArray("basePackages")) {
 				packageNames.add(basePackage);
 			}
 			for (Class<?> basePackageClass : attributes.getClassArray("basePackageClasses")) {
 				packageNames.add(basePackageClass.getPackage().getName());
 			}
+			// TODO: 如果都没设置过，就拿基本类的路径，设置到packageNames中
 			if (packageNames.isEmpty()) {
 				packageNames.add(ClassUtils.getPackageName(metadata.getClassName()));
 			}

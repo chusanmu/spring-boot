@@ -78,6 +78,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: tomcat工厂类，tomcat webServer就是利用此类来创建的
  * {@link AbstractServletWebServerFactory} that can be used to create
  * {@link TomcatWebServer}s. Can be initialized using Spring's
  * {@link ServletContextInitializer}s or Tomcat {@link LifecycleListener}s.
@@ -106,9 +107,10 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	private static final Set<Class<?>> NO_CLASSES = Collections.emptySet();
 
 	/**
+	 * TODO: 默认的协议处理器
 	 * The class name of default protocol used.
 	 */
-	public static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
+	public static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11. ";
 
 	private File baseDirectory;
 
@@ -174,26 +176,34 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+		// TODO: 直接创建了一个tomcat
 		Tomcat tomcat = new Tomcat();
+		// TODO: 如果baseDirectory 为空，就创建一个临时目录
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
+		// TODO: 创建了一个Connector
 		Connector connector = new Connector(this.protocol);
 		connector.setThrowOnFailure(true);
+		// TODO: service设置connector 连接器
 		tomcat.getService().addConnector(connector);
 		customizeConnector(connector);
+		// TODO: 设置connector
 		tomcat.setConnector(connector);
 		tomcat.getHost().setAutoDeploy(false);
 		configureEngine(tomcat.getEngine());
+		// TODO: 添加其他的connector连接器
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
 		// TODO: initializers被一直往下传下去
+		// TODO: 准备context了
 		prepareContext(tomcat.getHost(), initializers);
 		return getTomcatWebServer(tomcat);
 	}
 
 	private void configureEngine(Engine engine) {
 		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);
+		// TODO: 往engine的pipeline中添加valve
 		for (Valve valve : this.engineValves) {
 			engine.getPipeline().addValve(valve);
 		}
@@ -201,10 +211,12 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		// TODO: spring boot自己扩展了一个 context, TomcatEmbeddedContext 继承了 StandardContext
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
 		}
+		// TODO: 对context进行设置
 		context.setName(getContextPath());
 		context.setDisplayName(getDisplayName());
 		context.setPath(getContextPath());
@@ -222,6 +234,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			// Tomcat is < 8.5.39. Continue.
 		}
 		configureTldSkipPatterns(context);
+		// TODO: 设置类加载器
 		WebappLoader loader = new WebappLoader();
 		loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName());
 		loader.setDelegate(true);
@@ -301,7 +314,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	// Needs to be protected so it can be used by subclasses
 	protected void customizeConnector(Connector connector) {
+		// TODO: 如果你给了个负数，这里就改成0了
 		int port = Math.max(getPort(), 0);
+		// TODO: 设置connector的端口号
 		connector.setPort(port);
 		if (StringUtils.hasText(getServerHeader())) {
 			connector.setProperty("server", getServerHeader());
@@ -309,8 +324,10 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (connector.getProtocolHandler() instanceof AbstractProtocol) {
 			customizeProtocol((AbstractProtocol<?>) connector.getProtocolHandler());
 		}
+		// TODO: 对protocolHandler进行定制化设置
 		invokeProtocolHandlerCustomizers(connector.getProtocolHandler());
 		if (getUriEncoding() != null) {
+			// TODO: 设置u8编码
 			connector.setURIEncoding(getUriEncoding().name());
 		}
 		// Don't bind to the socket prematurely if ApplicationContext is slow to start
@@ -318,9 +335,11 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (getSsl() != null && getSsl().isEnabled()) {
 			customizeSsl(connector);
 		}
+		// TODO: 对压缩相关的东西进行定制化设置
 		TomcatConnectorCustomizer compression = new CompressionConnectorCustomizer(getCompression());
 		compression.customize(connector);
 		for (TomcatConnectorCustomizer customizer : this.tomcatConnectorCustomizers) {
+			// TODO: 对connector进行定制化设置
 			customizer.customize(connector);
 		}
 	}
@@ -354,6 +373,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		TomcatStarter starter = new TomcatStarter(initializers);
 		if (context instanceof TomcatEmbeddedContext) {
 			TomcatEmbeddedContext embeddedContext = (TomcatEmbeddedContext) context;
+			// TODO: 将starter设置进context中
 			embeddedContext.setStarter(starter);
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
@@ -376,6 +396,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
+		// TODO: 对context进行定制化设置
 		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
 			customizer.customize(context);
 		}
@@ -431,6 +452,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	}
 
 	/**
+	 * TODO: 直接new了一个tomcatwebServer
 	 * Factory method called to create the {@link TomcatWebServer}. Subclasses can
 	 * override this method to return a different {@link TomcatWebServer} or apply
 	 * additional processing to the Tomcat server.

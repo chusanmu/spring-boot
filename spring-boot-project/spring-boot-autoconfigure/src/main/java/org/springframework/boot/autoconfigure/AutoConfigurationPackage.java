@@ -26,6 +26,8 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
+ * TODO: 一个很重要的注解，自动配置包
+ *
  * Registers packages with {@link AutoConfigurationPackages}. When no {@link #basePackages
  * base packages} or {@link #basePackageClasses base package classes} are specified, the
  * package of the annotated class is registered.
@@ -38,6 +40,7 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
+// TODO: 导入了一个Registrar的类
 @Import(AutoConfigurationPackages.Registrar.class)
 public @interface AutoConfigurationPackage {
 

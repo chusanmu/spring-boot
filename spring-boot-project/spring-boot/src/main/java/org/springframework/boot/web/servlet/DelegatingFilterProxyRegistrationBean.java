@@ -28,6 +28,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 /**
+ * TODO: 它其实是一个专门用于注册filter的bean, 只是它采用的方式是委托，它最终执行的其实是委托的一个filter, 目标bean是 targetBeanName
+ *
  * A {@link ServletContextInitializer} to register {@link DelegatingFilterProxy}s in a
  * Servlet 3.0+ container. Similar to the {@link ServletContext#addFilter(String, Filter)
  * registration} features provided by {@link ServletContext} but with a Spring Bean
@@ -53,9 +55,14 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  */
 public class DelegatingFilterProxyRegistrationBean extends AbstractFilterRegistrationBean<DelegatingFilterProxy>
 		implements ApplicationContextAware {
-
+	/**
+	 * TODO: 用于从容器中拿出 名为 targetBeanName 的bean
+	 */
 	private ApplicationContext applicationContext;
 
+	/**
+	 * TODO: 真正的filter
+	 */
 	private final String targetBeanName;
 
 	/**
@@ -82,6 +89,10 @@ public class DelegatingFilterProxyRegistrationBean extends AbstractFilterRegistr
 		return this.targetBeanName;
 	}
 
+	/**
+	 * TODO: 获取一个filter, 拿到的filter是DelegatingFilterProxy, 委托代理模式
+	 * @return
+	 */
 	@Override
 	public DelegatingFilterProxy getFilter() {
 		return new DelegatingFilterProxy(this.targetBeanName, getWebApplicationContext()) {

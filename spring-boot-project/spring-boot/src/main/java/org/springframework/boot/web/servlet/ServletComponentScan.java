@@ -51,6 +51,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface ServletComponentScan {
 
 	/**
+	 * TODO: 扫描路径
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation
 	 * declarations e.g.: {@code @ServletComponentScan("org.my.pkg")} instead of
 	 * {@code @ServletComponentScan(basePackages="org.my.pkg")}.
@@ -60,6 +61,7 @@ public @interface ServletComponentScan {
 	String[] value() default {};
 
 	/**
+	 * TODO: 扫描路径
 	 * Base packages to scan for annotated servlet components. {@link #value()} is an
 	 * alias for (and mutually exclusive with) this attribute.
 	 * <p>
